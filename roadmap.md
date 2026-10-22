@@ -16,5 +16,5 @@
 - [x] Resizable individual windows and joined diagonal resizing with separation and saved layouts
 - [x] Advanced EQ controls and future enhancement plug-in availability
 - [x] Verify three-window resizing, separation, saved layout and live EQ
-- [ ] Official uploaded logo with increasing neon startup lights
-- [ ] Original cinematic startup sound, mute/skip controls and verified transition to player
+- [x] Official uploaded logo with increasing neon startup lights
+- [x] Original cinematic startup sound, mute/skip controls and verified transition to player
