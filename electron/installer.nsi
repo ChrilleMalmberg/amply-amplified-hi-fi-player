@@ -1,7 +1,17 @@
-; AmPly HiFi Player V-2.1 installer (build with: makensis electron/installer.nsi after packaging)
+; AmPly HiFi Player V-3.0 installer
 Unicode true
-Name "AmPly HiFi Player V-2.1"
-OutFile "..\electron-release\AmPly-V2.1-Setup.exe"
+!ifndef PACKAGE_DIR
+  !define PACKAGE_DIR "..\electron-release\Ampli Player-win32-x64"
+!endif
+!ifndef INSTALLER_OUT
+  !define INSTALLER_OUT "..\electron-release\AmPly-V3.0-Setup.exe"
+!endif
+Name "AmPly HiFi Player V-3.0"
+OutFile "${INSTALLER_OUT}"
+VIProductVersion "3.0.0.0"
+VIAddVersionKey "ProductName" "AmPly HiFi Player"
+VIAddVersionKey "FileDescription" "AmPly HiFi Player V-3.0 Setup"
+VIAddVersionKey "FileVersion" "3.0.0"
 InstallDir "$LOCALAPPDATA\Programs\Ampli Player"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
@@ -15,14 +25,14 @@ UninstPage instfiles
 
 Section "Install"
   SetOutPath "$INSTDIR"
-  File /r "..\electron-release\Ampli Player-win32-x64\*.*"
+  File /r "${PACKAGE_DIR}\*.*"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateShortcut "$DESKTOP\AmPly HiFi Player.lnk" "$INSTDIR\Ampli Player.exe"
   CreateDirectory "$SMPROGRAMS\AmPly HiFi Player"
   CreateShortcut "$SMPROGRAMS\AmPly HiFi Player\AmPly HiFi Player.lnk" "$INSTDIR\Ampli Player.exe"
   CreateShortcut "$SMPROGRAMS\AmPly HiFi Player\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayName" "AmPly HiFi Player V-2.1"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayVersion" "2.1"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayName" "AmPly HiFi Player V-3.0"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayVersion" "3.0"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "UninstallString" "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayIcon" "$INSTDIR\Ampli Player.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "Publisher" "AmPly HiFi Player"
