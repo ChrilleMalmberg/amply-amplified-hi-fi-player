@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:desktop": "vite build -c ./vite.electron.config.ts",
-    "package:win": "npm run build:desktop && electron-packager . Llamamp --platform=win32 --arch=x64 --out=electron-release --overwrite --ignore=node_modules --ignore=^/src --ignore=^/public --ignore=^/electron-release --ignore=^/dist$ --ignore=^/dist/ --ignore=^/\\.lovable"
+    "package:win": "npm run build:desktop && electron-packager . \"Ampli Player\" --icon=electron/icon.ico --app-version=2.1.0 --win32metadata.ProductName=\"HiFi Ampli Player\" --win32metadata.FileDescription=\"HiFi Ampli Player V-2.1\" --platform=win32 --arch=x64 --out=electron-release --overwrite --ignore=node_modules --ignore=^/src --ignore=^/public --ignore=^/electron-release --ignore=^/dist$ --ignore=^/dist/ --ignore=^/\\.lovable"
   },
   "overrides": {
     "rolldown": "1.2.1"
