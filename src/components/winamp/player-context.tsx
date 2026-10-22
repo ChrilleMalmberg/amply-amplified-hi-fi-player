@@ -2,7 +2,7 @@ import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { nextIndex, prevIndex, readTags } from "@/lib/winamp-logic";
 import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/playlist-store";
-import { applyEqualizer, effectiveBalance, type AudioCapabilities } from "@/lib/audio-plugins";
+import { applyEqualizer, effectiveBalance, normalizeEqGain, type AudioCapabilities } from "@/lib/audio-plugins";
 
 export type Track = { id: number; file: File; url: string; title: string; duration: number };
 
@@ -25,7 +25,7 @@ const EQ_DEFAULT: EqState = { on: false, preamp: 0, bands: new Array(10).fill(0)
 function loadEq(): EqState {
   try {
     const s = JSON.parse(localStorage.getItem(EQ_KEY) || "null");
-    if (s && Array.isArray(s.bands) && s.bands.length === 10) return { on: !!s.on, preamp: +s.preamp || 0, bands: s.bands.map((v: unknown) => Number(v) || 0) };
+    if (s && Array.isArray(s.bands) && s.bands.length === 10) return { on: !!s.on, preamp: normalizeEqGain(Number(s.preamp)), bands: s.bands.map((v: unknown) => normalizeEqGain(Number(v))) };
   } catch { /* ignore */ }
   return EQ_DEFAULT;
 }
@@ -228,11 +228,12 @@ function usePlayerState() {
   }, [tracks, toItems]);
 
   const updateEq = useCallback((next: EqState) => {
-    setEq(next);
+    const normalized = { ...next, preamp: normalizeEqGain(next.preamp), bands: next.bands.map(normalizeEqGain) };
+    setEq(normalized);
     try {
-      localStorage.setItem(EQ_KEY, JSON.stringify(next));
+      localStorage.setItem(EQ_KEY, JSON.stringify(normalized));
     } catch { /* ignore */ }
-    if (eqPreampRef.current) applyEqToGraph(eqPreampRef.current, eqBandsRef.current, next);
+    if (eqPreampRef.current) applyEqToGraph(eqPreampRef.current, eqBandsRef.current, normalized);
   }, []);
 
   useEffect(() => { updateEq(loadEq()); }, [updateEq]);
@@ -351,6 +352,7 @@ function usePlayerState() {
     eq,
     eqPresetName,
     setEqOn: (on: boolean) => updateEq({ ...eq, on }),
+    resetEq: () => { setEqPresetName("Flat"); updateEq({ ...eq, preamp: 0, bands: Array(10).fill(0) }); },
     setEqBand: (i: number, v: number) => {
       setEqPresetName(null);
       updateEq({ ...eq, on: true, bands: eq.bands.map((b, k) => (k === i ? v : b)) });
