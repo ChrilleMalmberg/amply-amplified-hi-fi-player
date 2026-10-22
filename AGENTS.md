@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Winamp player lives in src/components/winamp with state in player-context; keep the audio path source->panner->destination with the analyser as a side tap only, so visuals never alter sound quality.

@@ -142,3 +142,89 @@
     color: var(--color-foreground);
   }
 }
+
+/* ===== Winamp 2.0 skin system ===== */
+.wa-desktop {
+  --wa-desk: oklch(0.5 0.09 195);
+  --wa-face: oklch(0.3 0.03 275);
+  --wa-hi: oklch(0.52 0.03 275);
+  --wa-lo: oklch(0.15 0.02 275);
+  --wa-lcd: oklch(0.1 0 0);
+  --wa-lcd-text: oklch(0.8 0.25 142);
+  --wa-spec-hi: oklch(0.75 0.2 60);
+  --wa-title: oklch(0.85 0.12 90);
+  --wa-title-bg: oklch(0.25 0.04 270);
+  --wa-sel: oklch(0.38 0.17 265);
+  --wa-cur: oklch(0.97 0 0);
+  position: fixed; inset: 0; overflow: hidden;
+  background: var(--wa-desk);
+  font-family: "VT323", monospace;
+  user-select: none;
+}
+.wa-desktop[data-skin="nucleo"] { --wa-face: oklch(0.32 0.08 245); --wa-hi: oklch(0.55 0.1 240); --wa-lo: oklch(0.16 0.05 250); --wa-lcd-text: oklch(0.82 0.14 210); --wa-title: oklch(0.9 0.08 210); --wa-desk: oklch(0.25 0.05 250); }
+.wa-desktop[data-skin="ruby"] { --wa-face: oklch(0.32 0.1 20); --wa-hi: oklch(0.55 0.13 20); --wa-lo: oklch(0.15 0.05 20); --wa-lcd-text: oklch(0.75 0.2 30); --wa-spec-hi: oklch(0.9 0.15 90); --wa-title: oklch(0.88 0.1 60); --wa-desk: oklch(0.22 0.04 20); }
+.wa-desktop[data-skin="matrix"] { --wa-face: oklch(0.14 0.02 145); --wa-hi: oklch(0.35 0.08 145); --wa-lo: oklch(0.05 0 0); --wa-lcd-text: oklch(0.85 0.28 145); --wa-spec-hi: oklch(0.95 0.15 145); --wa-title: oklch(0.85 0.28 145); --wa-desk: oklch(0.08 0.01 145); }
+
+.wa-window { position: absolute; background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); box-shadow: 0 0 0 1px var(--wa-lo); color: var(--wa-lcd-text); }
+.wa-titlebar { display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 4px; background: var(--wa-title-bg); cursor: grab; touch-action: none; }
+.wa-title-stripes { flex: 1; height: 10px; background: repeating-linear-gradient(to bottom, var(--wa-title) 0 1px, transparent 1px 3px); opacity: .7; }
+.wa-title-text { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--wa-title); letter-spacing: 2px; }
+.wa-tbtn { width: 16px; height: 16px; line-height: 12px; font-size: 14px; background: var(--wa-face); color: var(--wa-title); border: 1px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+
+.wa-main { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.wa-row { display: flex; gap: 8px; }
+.wa-lcd { background: var(--wa-lcd); color: var(--wa-lcd-text); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-display { width: 170px; padding: 4px 6px; display: flex; flex-direction: column; }
+.wa-status { font-size: 14px; height: 14px; }
+.wa-time { font-size: 44px; line-height: 40px; text-align: right; color: var(--wa-lcd-text); background: none; text-shadow: 0 0 6px var(--wa-lcd-text); }
+.wa-spectrum { width: 152px; height: 32px; image-rendering: pixelated; cursor: pointer; }
+.wa-info { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.wa-marquee { height: 28px; overflow: hidden; white-space: nowrap; font-size: 22px; line-height: 24px; }
+.wa-marquee-inner { display: inline-block; animation: wa-scroll 18s linear infinite; }
+@keyframes wa-scroll { to { transform: translateX(-50%); } }
+.wa-meta { display: flex; gap: 6px; align-items: center; font-size: 18px; }
+.wa-small { padding: 0 6px; font-size: 18px; }
+.wa-grow { flex: 1; }
+.wa-label { color: var(--wa-hi); font-family: "Silkscreen", monospace; font-size: 10px; }
+.wa-label.wa-on, .wa-toggle.wa-on { color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
+.wa-sliders { display: flex; gap: 8px; align-items: center; }
+.wa-range { appearance: none; height: 10px; flex: 1; background: linear-gradient(to right, var(--wa-lo), var(--wa-lcd-text)); border: 1px solid var(--wa-lo); }
+.wa-balance { flex: .6; background: linear-gradient(to right, var(--wa-lcd-text), var(--wa-lo), var(--wa-lcd-text)); }
+.wa-seek { flex: none; width: 100%; background: var(--wa-lo); }
+.wa-range::-webkit-slider-thumb { appearance: none; width: 20px; height: 14px; background: var(--wa-hi); border: 1px solid; border-color: var(--wa-title) var(--wa-lo) var(--wa-lo) var(--wa-title); }
+.wa-range::-moz-range-thumb { width: 20px; height: 14px; background: var(--wa-hi); border-radius: 0; }
+.wa-controls { display: flex; gap: 2px; align-items: center; }
+.wa-btn { width: 46px; height: 36px; font-size: 18px; color: var(--wa-cur); background: linear-gradient(var(--wa-hi), var(--wa-face)); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+.wa-btn:active, .wa-toggle:active { border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-eject { margin-left: 8px; width: 40px; }
+.wa-toggle { font-family: "Silkscreen", monospace; font-size: 10px; padding: 3px 6px; color: var(--wa-hi); background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+.wa-spacer { flex: 1; }
+.wa-logo { font-size: 20px; color: var(--wa-title); }
+.wa-blink { animation: wa-blink 1s steps(1) infinite; }
+@keyframes wa-blink { 50% { opacity: 0; } }
+
+.wa-pl { padding: 6px; }
+.wa-pl.wa-drop .wa-pl-list { outline: 2px dashed var(--wa-lcd-text); }
+.wa-pl-list { height: 220px; overflow-y: auto; background: var(--wa-lcd); font-size: 20px; border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-pl-row { display: flex; justify-content: space-between; gap: 8px; padding: 0 6px; cursor: default; }
+.wa-pl-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wa-current { color: var(--wa-cur); }
+.wa-selected { background: var(--wa-sel); }
+.wa-pl-empty { padding: 24px; text-align: center; color: var(--wa-hi); }
+.wa-pl-warn { font-size: 16px; color: var(--wa-spec-hi); padding: 2px 4px; }
+.wa-pl-bar { display: flex; gap: 4px; align-items: center; margin-top: 6px; }
+
+.wa-vis { padding: 6px; }
+.wa-vis-canvas { width: 100%; display: block; background: var(--wa-lcd); }
+
+.wa-menu { position: fixed; z-index: 50; min-width: 160px; background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); padding: 2px; }
+.wa-menu-head { color: var(--wa-title); padding: 2px 8px; font-family: "Silkscreen", monospace; font-size: 10px; }
+.wa-menu-item { display: block; width: 100%; text-align: left; padding: 2px 8px; font-size: 20px; color: var(--wa-lcd-text); white-space: pre; text-transform: capitalize; }
+.wa-menu-item:hover { background: var(--wa-sel); }
+.wa-hint { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; color: var(--wa-title); font-size: 18px; opacity: .7; pointer-events: none; }
+
+.wa-intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--wa-lcd); color: var(--wa-lcd-text); }
+.wa-intro-llama { width: 260px; height: auto; image-rendering: pixelated; }
+.wa-intro-title { font-family: "Silkscreen", monospace; font-size: 56px; color: var(--wa-title); letter-spacing: 8px; }
+.wa-intro-sub { font-size: 32px; }
+.wa-intro-click { margin-top: 16px; font-size: 22px; color: var(--wa-hi); }
