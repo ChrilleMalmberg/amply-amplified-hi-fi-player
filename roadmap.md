@@ -26,4 +26,4 @@
 - [x] Verify shared playback, native docking, resizing, saved positions, and negative-coordinate monitor recovery tests in a real Linux Electron session
 - [x] Deliver the revised v3.0 Windows installer
 - [x] Confirm Windows installation launches independent windows (user confirmation); physical multi-monitor behavior remains untested
-- [ ] Restore the native right-click skin menu, verify synchronized saved skins, and deliver an updated installer
+- [x] Restore the native right-click skin menu, verify synchronized saved skins in real Electron windows, and deliver an updated installer
