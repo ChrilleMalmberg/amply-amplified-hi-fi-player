@@ -15,3 +15,4 @@
 - Music library imports use browser-safe music-metadata and a reserved IndexedDB library record with original bytes; source windows share the catalog but keep independent filters, so offline browsing never moves users' original folders.
 - Plug-in settings use a capability catalog in src/lib/audio-plugins.ts and the existing player processors, never simulated native hosting; shared player state keeps EQ and balance controls synchronized and persists balance locally for offline use.
 - WindowWorkspace owns saved geometry and detached membership; edge-connected windows resize proportionally through window-layout helpers while title-bar dragging separates individual windows, so docking never requires scaling text or audio controls.
+- Startup sound uses a short-lived independent Web Audio graph started by the power button and closed on skip/completion/unmount; it must never change the music player's graph or saved audio settings.
