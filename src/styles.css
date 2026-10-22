@@ -430,3 +430,59 @@
 }
 .wa-desktop[data-mode="small"] [data-wa-win="main"] { height: auto !important; }
 .wa-desktop[data-mode="small"] .wa-window-content { flex: none; }
+
+/* Official startup artwork with a progressively powered neon street-sign frame. */
+.wa-neon-startup {
+  --startup-dark: oklch(0.095 0 0);
+  --startup-neon: oklch(0.73 0.2 48);
+  --startup-cool: oklch(0.79 0.12 190);
+  --startup-ink: oklch(0.95 0 0);
+  --startup-metal: oklch(0.28 0.008 190);
+  --startup-glow: 0 0 12px var(--startup-neon), 0 0 32px color-mix(in oklab, var(--startup-neon) 45%, transparent);
+  z-index: 2147483647;
+  gap: 28px; padding: 24px; overflow: hidden;
+  background-color: var(--startup-dark);
+  background-image: repeating-linear-gradient(0deg, transparent 0 47px, var(--startup-metal) 48px 49px);
+  color: var(--startup-ink);
+}
+.wa-neon-sign { position: relative; width: min(100%, 940px, calc((100dvh - 170px) * 1.778)); aspect-ratio: 1366 / 768; border: 2px solid var(--startup-metal); background: var(--startup-dark); box-shadow: 0 0 0 8px var(--startup-dark), 0 0 0 9px var(--startup-metal); }
+.wa-neon-sign::before, .wa-neon-sign::after { content: ""; position: absolute; z-index: -1; top: -80px; height: 80px; width: 2px; background: var(--startup-metal); }
+.wa-neon-sign::before { left: 15%; }
+.wa-neon-sign::after { right: 15%; }
+.wa-startup-logo { display: block; width: 100%; height: 100%; object-fit: contain; filter: brightness(.45); }
+.wa-startup-lights { position: absolute; bottom: 2.8%; left: 25%; right: 25%; display: grid; grid-template-columns: repeat(16, 1fr); gap: 5px; height: 5px; }
+.wa-startup-lights span { background: var(--startup-metal); }
+.wa-neon-startup[data-running="true"] .wa-startup-logo { animation: wa-neon-power 6.2s ease-in-out forwards; }
+.wa-neon-startup[data-running="true"] .wa-neon-sign { animation: wa-sign-power 6.2s ease-in-out forwards; }
+.wa-neon-startup[data-running="true"] .wa-startup-lights span { animation: wa-light-power .4s ease-out forwards; }
+.wa-startup-lights span:nth-child(1) { animation-delay: .2s; }
+.wa-startup-lights span:nth-child(2) { animation-delay: .45s; }
+.wa-startup-lights span:nth-child(3) { animation-delay: .7s; }
+.wa-startup-lights span:nth-child(4) { animation-delay: .95s; }
+.wa-startup-lights span:nth-child(5) { animation-delay: 1.2s; }
+.wa-startup-lights span:nth-child(6) { animation-delay: 1.45s; }
+.wa-startup-lights span:nth-child(7) { animation-delay: 1.7s; }
+.wa-startup-lights span:nth-child(8) { animation-delay: 1.95s; }
+.wa-startup-lights span:nth-child(9) { animation-delay: 2.2s; }
+.wa-startup-lights span:nth-child(10) { animation-delay: 2.45s; }
+.wa-startup-lights span:nth-child(11) { animation-delay: 2.7s; }
+.wa-startup-lights span:nth-child(12) { animation-delay: 2.95s; }
+.wa-startup-lights span:nth-child(13) { animation-delay: 3.2s; }
+.wa-startup-lights span:nth-child(14) { animation-delay: 3.45s; }
+.wa-startup-lights span:nth-child(15) { animation-delay: 3.7s; }
+.wa-startup-lights span:nth-child(16) { animation-delay: 3.95s; }
+.wa-startup-controls { display: flex; gap: 12px; align-items: center; justify-content: center; min-height: 42px; flex: none; }
+.wa-startup-power, .wa-startup-icon { color: var(--startup-ink); background: var(--startup-dark); border: 1px solid var(--startup-metal); height: 42px; padding: 0 18px; font: inherit; font-size: 20px; }
+.wa-startup-icon { width: 42px; padding: 0; }
+.wa-startup-power:hover, .wa-startup-icon:hover { border-color: var(--startup-neon); color: var(--startup-neon); }
+.wa-startup-status { width: 148px; color: var(--startup-neon); font-size: 20px; }
+.wa-startup-audio-notice { position: absolute; bottom: 12px; font-size: 16px; color: var(--startup-ink); }
+@keyframes wa-neon-power { 0% { filter: brightness(.45); } 25% { filter: brightness(.65); } 65%, 88% { filter: brightness(1.12); } 100% { filter: brightness(1); } }
+@keyframes wa-sign-power { 0% { border-color: var(--startup-metal); } 65%, 100% { border-color: var(--startup-neon); box-shadow: var(--startup-glow), inset 0 0 12px color-mix(in oklab, var(--startup-neon) 25%, transparent); } }
+@keyframes wa-light-power { to { background: var(--startup-cool); box-shadow: 0 0 8px var(--startup-cool); } }
+@media (max-width: 560px) { .wa-neon-startup { padding: 16px; gap: 24px; } .wa-startup-lights { gap: 3px; height: 3px; } }
+@media (prefers-reduced-motion: reduce) {
+  .wa-neon-startup[data-running="true"] .wa-startup-logo { animation: none; filter: brightness(1); }
+  .wa-neon-startup[data-running="true"] .wa-neon-sign { animation: none; border-color: var(--startup-neon); box-shadow: var(--startup-glow); }
+  .wa-neon-startup[data-running="true"] .wa-startup-lights span { animation: none; background: var(--startup-cool); }
+}
