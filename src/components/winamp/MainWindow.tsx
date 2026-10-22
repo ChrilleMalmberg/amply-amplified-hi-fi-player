@@ -1,7 +1,7 @@
+import { AmplyLogo } from "./AmplyLogo";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer, AUDIO_ACCEPT } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
-import bolt from "@/assets/bolt-icon.svg";
 
 function cssVar(el: Element, n: string) {
   return getComputedStyle(el).getPropertyValue(n).trim();
@@ -68,7 +68,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
   const fileRef = useRef<HTMLInputElement>(null);
   const t = p.tracks[p.current];
   const kbps = t && t.duration ? Math.round((t.file.size * 8) / t.duration / 1000) : 0;
-  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "HIFI AMPLI PLAYER V-2.1  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
+  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "AMPLY HIFI PLAYER V-2.1  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
   const [remaining, setRemaining] = useState(false);
   const shown = remaining ? p.duration - p.time : p.time;
 
@@ -123,7 +123,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
         <span className="wa-spacer" />
         <button className={`wa-toggle ${p.shuffle ? "wa-on" : ""}`} onClick={p.toggleShuffle}>SHUFFLE</button>
         <button className={`wa-toggle ${p.repeat ? "wa-on" : ""}`} onClick={p.toggleRepeat}>↻</button>
-        <img src={bolt} alt="Ampli Player" className="wa-logo" width={26} height={26} />
+        <AmplyLogo size={14} />
       </div>
     </div>
   );
