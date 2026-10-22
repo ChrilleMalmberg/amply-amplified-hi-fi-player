@@ -492,3 +492,11 @@
   .wa-neon-startup[data-running="true"] .wa-neon-sign { animation: none; border-color: var(--startup-neon); box-shadow: var(--startup-glow); }
   .wa-neon-startup[data-running="true"] .wa-startup-lights span { animation: none; background: var(--startup-cool); }
 }
+
+/* A native panel fills its real desktop window, never a shared canvas. */
+.wa-native-desktop.wa-desktop { display: block; padding: 0; overflow: hidden; }
+.wa-native-desktop.wa-desktop .wa-native-window { position: absolute; inset: 0; width: 100%; height: 100% !important; max-width: none; min-width: 0; }
+.wa-native-desktop.wa-desktop[data-mode="small"] .wa-window-content { flex: 1; }
+.wa-native-desktop .wa-titlebar { gap: 3px; }
+.wa-native-desktop .wa-title-text { font-size: 10px; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-native-desktop .wa-title-stripes { min-width: 0; }

@@ -22,3 +22,7 @@
 - [x] Make dragging the main player move its snapped group, preserving individual separation and joined resizing
 - [x] Verify group movement, detachment, and saved positions
 - [x] Package and inspect the standalone AmPly v3.0 Windows installer
+- [x] Replace the outer desktop frame with independent real windows across monitors
+- [x] Verify shared playback, native docking, resizing, saved positions, and negative-coordinate monitor recovery tests in a real Linux Electron session
+- [x] Deliver the revised v3.0 Windows installer
+- [ ] Confirm installation and physical multi-monitor behavior on Windows; requires testing on the user's Windows machine
