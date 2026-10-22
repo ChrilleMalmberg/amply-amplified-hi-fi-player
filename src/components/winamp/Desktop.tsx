@@ -9,14 +9,14 @@ import { IntroSplash } from "./IntroSplash";
 
 const SKINS = ["classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
-const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 } };
+const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 }, eq: { x: 40, y: 500 } };
 
 function Shell() {
   const p = usePlayer();
   const [intro, setIntro] = useState(true);
   const [skin, setSkin] = useState<string>("classic");
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
-  const [show, setShow] = useState({ pl: true, vis: true });
+  const [show, setShow] = useState({ pl: true, vis: true, eq: false });
   const [menu, setMenu] = useState<Pos | null>(null);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ function Shell() {
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
       <WaWindow id="main" title="WINAMP" pos={pos.main} onMove={mv("main")} width={550}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
-        <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleVis={() => setShow((s) => ({ ...s, vis: !s.vis }))} />
+        <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleVis={() => setShow((s) => ({ ...s, vis: !s.vis }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {show.pl && (
         <WaWindow id="pl" title="WINAMP PLAYLIST" pos={pos.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
@@ -68,6 +68,11 @@ function Shell() {
       {show.vis && (
         <WaWindow id="vis" title="MILKDROP" pos={pos.vis} onMove={mv("vis")} width={540} onClose={() => setShow((s) => ({ ...s, vis: false }))}>
           <VisualizerWindow />
+        </WaWindow>
+      )}
+      {show.eq && (
+        <WaWindow id="eq" title="WINAMP EQUALIZER" pos={pos.eq ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
+          <EqualizerWindow />
         </WaWindow>
       )}
       {menu && (
