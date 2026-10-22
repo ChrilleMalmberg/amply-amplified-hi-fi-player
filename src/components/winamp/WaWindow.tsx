@@ -23,7 +23,7 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
     const ox = e.clientX - pos.x;
     const oy = e.clientY - pos.y;
     const others: Rect[] = Array.from(document.querySelectorAll<HTMLElement>("[data-wa-win]"))
-      .filter((n) => n.dataset.waWin !== id)
+      .filter((n) => n.dataset["waWin"] !== id)
       .map((n) => {
         const r = n.getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };

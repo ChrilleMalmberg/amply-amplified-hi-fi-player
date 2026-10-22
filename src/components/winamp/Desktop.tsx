@@ -55,17 +55,17 @@ function Shell() {
   return (
     <div className="wa-desktop" data-skin={skin} onClick={() => setMenu(null)}>
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
-      <WaWindow id="main" title="WINAMP" pos={pos.main} onMove={mv("main")} width={550}
+      <WaWindow id="main" title="WINAMP" pos={pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {show.pl && (
-        <WaWindow id="pl" title="WINAMP PLAYLIST" pos={pos.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
+        <WaWindow id="pl" title="WINAMP PLAYLIST" pos={pos["pl"] ?? DEFAULT.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
           <PlaylistWindow />
         </WaWindow>
       )}
       {show.eq && (
-        <WaWindow id="eq" title="WINAMP EQUALIZER" pos={pos.eq ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
+        <WaWindow id="eq" title="WINAMP EQUALIZER" pos={pos["eq"] ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
           <EqualizerWindow />
         </WaWindow>
       )}

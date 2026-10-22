@@ -23,7 +23,7 @@ const EQ_DEFAULT: EqState = { on: false, preamp: 0, bands: new Array(10).fill(0)
 function loadEq(): EqState {
   try {
     const s = JSON.parse(localStorage.getItem(EQ_KEY) || "null");
-    if (s && Array.isArray(s.bands) && s.bands.length === 10) return { on: !!s.on, preamp: +s.preamp || 0, bands: s.bands.map((v: unknown) => +v || 0) };
+    if (s && Array.isArray(s.bands) && s.bands.length === 10) return { on: !!s.on, preamp: +s.preamp || 0, bands: s.bands.map((v: unknown) => Number(v) || 0) };
   } catch { /* ignore */ }
   return EQ_DEFAULT;
 }
@@ -31,7 +31,7 @@ function loadEq(): EqState {
 /** Push EQ state into the live audio graph. OFF flattens every band (true bypass sound, no clicks). */
 function applyEqToGraph(pre: GainNode, bands: BiquadFilterNode[], eq: EqState) {
   pre.gain.value = eq.on ? Math.pow(10, eq.preamp / 20) : 1;
-  bands.forEach((bq, i) => (bq.gain.value = eq.on ? eq.bands[i] : 0));
+  bands.forEach((bq, i) => (bq.gain.value = eq.on ? (eq.bands[i] ?? 0) : 0));
 }
 
 export const AUDIO_EXT = /\.(mp3|flac|wav|wave|ogg|oga|opus|m4a|mp4|aac|aif|aiff|webm|weba|caf|alac|mka)$/i;
