@@ -85,7 +85,7 @@ function usePlayerState() {
       const pre = ctx.createGain();
       const bands = EQ_FREQS.map((f) => {
         const bq = ctx.createBiquadFilter();
-        bq.type = "peaking";
+        bq.type = f === EQ_FREQS[0] ? "lowshelf" : f === EQ_FREQS[EQ_FREQS.length - 1] ? "highshelf" : "peaking";
         bq.frequency.value = f;
         bq.Q.value = 1.1; // musical, low-phase-smear curve
         return bq;
@@ -305,11 +305,11 @@ function usePlayerState() {
     setEqOn: (on: boolean) => updateEq({ ...eq, on }),
     setEqBand: (i: number, v: number) => {
       setEqPresetName(null);
-      updateEq({ ...eq, bands: eq.bands.map((b, k) => (k === i ? v : b)) });
+      updateEq({ ...eq, on: true, bands: eq.bands.map((b, k) => (k === i ? v : b)) });
     },
     setEqPreamp: (v: number) => {
       setEqPresetName(null);
-      updateEq({ ...eq, preamp: v });
+      updateEq({ ...eq, on: true, preamp: v });
     },
     applyEqPreset: (name: string) => {
       const pr = EQ_PRESETS[name];

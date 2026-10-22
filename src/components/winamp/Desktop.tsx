@@ -3,18 +3,17 @@ import { PlayerProvider, usePlayer } from "./player-context";
 import { WaWindow } from "./WaWindow";
 import { MainWindow } from "./MainWindow";
 import { PlaylistWindow } from "./PlaylistWindow";
-import { VisualizerWindow } from "./VisualizerWindow";
 import { EqualizerWindow } from "./EqualizerWindow";
 import { IntroSplash } from "./IntroSplash";
 
-const SKINS = ["classic", "nucleo", "ruby", "matrix"] as const;
+const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
 const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 }, eq: { x: 40, y: 500 } };
 
 function Shell() {
   const p = usePlayer();
   const [intro, setIntro] = useState(true);
-  const [skin, setSkin] = useState<string>("classic");
+  const [skin, setSkin] = useState<string>("silver");
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
   const [show, setShow] = useState({ pl: true, vis: true, eq: false });
   const [menu, setMenu] = useState<Pos | null>(null);
@@ -23,14 +22,14 @@ function Shell() {
     try {
       const s = JSON.parse(localStorage.getItem("wa-state") || "null");
       if (s?.pos) setPos(s.pos);
-      if (s?.skin) setSkin(s.skin);
+      if (s?.skin && s.v === 3) setSkin(s.skin);
       if (s?.show) setShow(s.show);
     } catch {
       /* ignore */
     }
   }, []);
   useEffect(() => {
-    localStorage.setItem("wa-state", JSON.stringify({ pos, skin, show }));
+    localStorage.setItem("wa-state", JSON.stringify({ v: 3, pos, skin, show }));
   }, [pos, skin, show]);
 
   useEffect(() => {
@@ -58,16 +57,11 @@ function Shell() {
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
       <WaWindow id="main" title="WINAMP" pos={pos.main} onMove={mv("main")} width={550}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
-        <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleVis={() => setShow((s) => ({ ...s, vis: !s.vis }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
+        <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {show.pl && (
         <WaWindow id="pl" title="WINAMP PLAYLIST" pos={pos.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
           <PlaylistWindow />
-        </WaWindow>
-      )}
-      {show.vis && (
-        <WaWindow id="vis" title="MILKDROP" pos={pos.vis} onMove={mv("vis")} width={540} onClose={() => setShow((s) => ({ ...s, vis: false }))}>
-          <VisualizerWindow />
         </WaWindow>
       )}
       {show.eq && (
@@ -87,7 +81,7 @@ function Shell() {
           <button className="wa-menu-item" onClick={() => setPos(DEFAULT)}>  reset windows</button>
         </div>
       )}
-      <div className="wa-hint">Right-click the player for skins · Z X C V B keys · double-click visuals for fullscreen</div>
+      <div className="wa-hint">Right-click the player for skins · Z X C V B keys</div>
     </div>
   );
 }
