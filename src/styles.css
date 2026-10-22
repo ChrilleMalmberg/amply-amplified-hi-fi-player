@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource/vt323";
+@import "@fontsource/silkscreen";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -228,3 +230,8 @@
 .wa-intro-title { font-family: "Silkscreen", monospace; font-size: 56px; color: var(--wa-title); letter-spacing: 8px; }
 .wa-intro-sub { font-size: 32px; }
 .wa-intro-click { margin-top: 16px; font-size: 22px; color: var(--wa-hi); }
+.wa-plm { margin-top: 6px; border-top: 2px solid var(--wa-lo); padding-top: 4px; }
+.wa-plm-list { max-height: 140px; overflow-y: auto; background: var(--wa-lcd); font-size: 20px; margin-top: 4px; }
+.wa-plm-actions { display: flex; gap: 4px; }
+.wa-input { outline: none; font-family: inherit; }
+.wa-input::placeholder { color: var(--wa-hi); }

@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { usePlayer, AUDIO_ACCEPT } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
+import { PlaylistManager } from "./PlaylistManager";
 
 export function PlaylistWindow() {
   const p = usePlayer();
   const [sel, setSel] = useState<Set<number>>(new Set());
   const [drag, setDrag] = useState<number | null>(null);
   const [over, setOver] = useState(false);
+  const [lists, setLists] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const dirRef = useRef<HTMLInputElement>(null);
   const total = p.tracks.reduce((s, t) => s + (t.duration || 0), 0);
@@ -86,11 +88,13 @@ export function PlaylistWindow() {
         <button className="wa-toggle" onClick={() => dirRef.current?.click()}>+DIR</button>
         <button className="wa-toggle" onClick={remove}>REM</button>
         <button className="wa-toggle" onClick={() => setSel(new Set(p.tracks.map((t) => t.id)))}>SEL ALL</button>
+        <button className={`wa-toggle ${lists ? "wa-on" : ""}`} onClick={() => setLists((v) => !v)}>LISTS</button>
         <span className="wa-spacer" />
         <span className="wa-lcd wa-small">
           {p.tracks.length} / {fmtTime(total)}
         </span>
       </div>
+      {lists && <PlaylistManager onClose={() => setLists(false)} />}
     </div>
   );
 }
