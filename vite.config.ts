@@ -6,21 +6,10 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-// ELECTRON=1 builds a static single-page bundle for the Windows desktop app (no server needed).
-const electron = process.env.ELECTRON === "1";
-
-export default defineConfig(
-  electron
-    ? {
-        nitro: false,
-        tanstackStart: { server: { entry: "server" }, spa: { enabled: true } },
-        vite: { build: { outDir: "dist-electron" } },
-      }
-    : {
-        tanstackStart: {
-          // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-          // nitro/vite builds from this
-          server: { entry: "server" },
-        },
-      },
-);
+export default defineConfig({
+  tanstackStart: {
+    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
+    // nitro/vite builds from this
+    server: { entry: "server" },
+  },
+});
