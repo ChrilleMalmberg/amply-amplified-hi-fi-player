@@ -284,3 +284,4 @@
 .wa-eq-slider::-moz-range-thumb { width: 14px; height: 20px; background: var(--wa-face); border-radius: 0; }
 .wa-eq-label { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-family: "Silkscreen", monospace; font-size: 9px; color: var(--wa-lo); }
 .wa-eq-preset { font-size: 18px; color: var(--wa-btn-text); }
+.wa-desktop[data-skin="silver"] .wa-hint { color: var(--wa-lcd-text); }

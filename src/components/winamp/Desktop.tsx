@@ -8,7 +8,7 @@ import { IntroSplash } from "./IntroSplash";
 
 const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
-const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 }, eq: { x: 40, y: 500 } };
+const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 }, eq: { x: 40, y: 580 } };
 
 function Shell() {
   const p = usePlayer();
