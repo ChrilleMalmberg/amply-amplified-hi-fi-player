@@ -29,7 +29,7 @@ function Spectrum() {
         g.lineWidth = 2;
         g.beginPath();
         for (let x = 0; x < c.width; x++) {
-          const v = d[Math.floor((x / c.width) * d.length)] / 255;
+          const v = (d[Math.floor((x / c.width) * d.length)] ?? 0) / 255;
           const y = v * c.height;
           if (x) g.lineTo(x, y);
           else g.moveTo(x, y);
@@ -47,7 +47,7 @@ function Spectrum() {
         const a = Math.floor(Math.pow(i / 19, 2) * 300) + 1;
         const b = Math.floor(Math.pow((i + 1) / 19, 2) * 300) + 2;
         let m = 0;
-        for (let k = a; k < b; k++) m = Math.max(m, d[k]);
+        for (let k = a; k < b; k++) m = Math.max(m, d[k] ?? 0);
         const h = Math.round(((m / 255) * c.height) / 2) * 2;
         peaks[i] = Math.max(peaks[i] - 0.6, h);
         g.fillStyle = grad;

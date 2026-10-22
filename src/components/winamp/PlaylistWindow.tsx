@@ -32,7 +32,7 @@ export function PlaylistWindow() {
     p.setTracks((ts) => {
       const n = [...ts];
       const [m] = n.splice(drag, 1);
-      n.splice(to, 0, m);
+      if (m) n.splice(to, 0, m);
       return n;
     });
     setDrag(null);
