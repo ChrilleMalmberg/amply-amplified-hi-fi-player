@@ -37,9 +37,11 @@ export const AUDIO_EXT = /\.(mp3|mp2|mpga|flac|wav|wave|bwf|ogg|oga|opus|spx|m4a
 export const AUDIO_ACCEPT = "audio/*,.mp3,.mp2,.mpga,.flac,.wav,.bwf,.ogg,.oga,.opus,.spx,.m4a,.m4b,.mp4,.aac,.adts,.aif,.aiff,.aifc,.webm,.weba,.caf,.alac,.mka,.wma,.ape,.wv,.mpc,.tta,.dsf,.dff,.ac3,.eac3,.dts,.amr,.3gp,.3ga,.au,.snd,.mid,.midi";
 
 type Ctx = ReturnType<typeof usePlayerState>;
+export type PlayerApi = Ctx;
 // Keep one context instance across hot reloads so provider and consumers always match.
 const g = globalThis as unknown as { __llamampPlayerCtx?: React.Context<Ctx | null> };
 const PlayerCtx = (g.__llamampPlayerCtx ??= createContext<Ctx | null>(null));
+export const PlayerContext = PlayerCtx;
 export const usePlayer = () => {
   const c = useContext(PlayerCtx);
   if (!c) throw new Error("no player");
