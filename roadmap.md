@@ -13,3 +13,6 @@
 - [x] Verify library import, persistence, source windows and size switching
 - [x] Add plug-in settings with platform-aware support, live controls and saved settings
 - [x] Verify plug-in toggles, configuration and playback
+- [ ] Resizable individual windows and joined diagonal resizing with separation and saved layouts
+- [ ] Advanced EQ controls and future enhancement plug-in availability
+- [ ] Verify three-window resizing, separation, saved layout and live EQ
