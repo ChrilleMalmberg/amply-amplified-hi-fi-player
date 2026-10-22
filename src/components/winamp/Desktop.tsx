@@ -15,7 +15,7 @@ function Shell() {
   const [intro, setIntro] = useState(true);
   const [skin, setSkin] = useState<string>("silver");
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
-  const [show, setShow] = useState({ pl: true, vis: true, eq: false });
+  const [show, setShow] = useState({ pl: true, vis: true, eq: true });
   const [menu, setMenu] = useState<Pos | null>(null);
 
   useEffect(() => {

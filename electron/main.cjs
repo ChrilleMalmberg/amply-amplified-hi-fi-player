@@ -32,10 +32,15 @@ async function createWindow() {
   const url = await startServer();
   Menu.setApplicationMenu(null);
   const win = new BrowserWindow({
-    width: 1200,
-    height: 760,
-    backgroundColor: "#007a7a",
-    title: "Llamamp",
+    width: 570,
+    height: 880,
+    minWidth: 420,
+    minHeight: 300,
+    useContentSize: true,
+    resizable: true,
+    backgroundColor: "#0b130e",
+    title: "HiFi Ampli Player V-2.1",
+    icon: path.join(__dirname, "icon.ico"),
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, nodeIntegration: false, autoplayPolicy: "no-user-gesture-required" },
   });
@@ -43,9 +48,11 @@ async function createWindow() {
     void shell.openExternal(u);
     return { action: "deny" };
   });
+  win.on("page-title-updated", (e) => e.preventDefault());
   await win.loadURL(url);
 }
 
 if (!app.requestSingleInstanceLock()) app.quit();
+app.setAppUserModelId("HiFi.AmpliPlayer");
 app.whenReady().then(createWindow);
 app.on("window-all-closed", () => app.quit());
