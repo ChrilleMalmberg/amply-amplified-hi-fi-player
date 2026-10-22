@@ -12,8 +12,10 @@ function Spectrum() {
   const ref = useRef<HTMLCanvasElement>(null);
   const [scope, setScope] = useState(false);
   useEffect(() => {
-    const c = ref.current!;
-    const g = c.getContext("2d")!;
+    const c = ref.current;
+    if (!c) return;
+    const g = c.getContext("2d");
+    if (!g) return;
     const peaks = new Array(19).fill(0);
     let raf = 0;
     const draw = () => {

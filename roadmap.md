@@ -7,3 +7,7 @@
 - [x] Silver/gray frame skin with brighter button underlay, green matrix text kept
 - [x] 10-band equalizer (Winamp bands, preamp, presets, ON toggle, persisted)
 - [x] HiFi focus: lossless formats, clean EQ chain, playback latency hint
+- [x] Auto-organized offline music library: folders, artists, albums, genres and search
+- [x] Independent source browser windows with queue actions
+- [x] Top-right compact / full-size player controls
+- [x] Verify library import, persistence, source windows and size switching

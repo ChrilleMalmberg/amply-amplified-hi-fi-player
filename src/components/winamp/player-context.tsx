@@ -55,7 +55,7 @@ function usePlayerState() {
   const pannerRef = useRef<StereoPannerNode | null>(null);
   const eqPreampRef = useRef<GainNode | null>(null);
   const eqBandsRef = useRef<BiquadFilterNode[]>([]);
-  const [eq, setEq] = useState<EqState>(loadEq);
+  const [eq, setEq] = useState<EqState>(EQ_DEFAULT);
   const [eqPresetName, setEqPresetName] = useState<string | null>(null);
   const idRef = useRef(1);
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -232,6 +232,27 @@ function usePlayerState() {
     if (eqPreampRef.current) applyEqToGraph(eqPreampRef.current, eqBandsRef.current, next);
   }, []);
 
+  useEffect(() => { updateEq(loadEq()); }, [updateEq]);
+
+  const tracksFromItems = (items: StoredItem[]): Track[] => items.map(item => ({
+    id: idRef.current++, file: item.file, url: URL.createObjectURL(item.file),
+    title: item.artist && item.artist !== "Unknown artist" ? `${item.artist} - ${item.title}` : item.title,
+    duration: item.duration,
+  }));
+  const appendItems = (items: StoredItem[]) => {
+    const added = tracksFromItems(items);
+    setTracks(old => [...old, ...added]);
+  };
+  const playItems = (items: StoredItem[]) => {
+    if (!items.length) return;
+    const added = tracksFromItems(items);
+    const el = audioRef.current;
+    el?.pause();
+    st.current = { ...st.current, tracks: added, current: 0 };
+    setTracks(old => { old.forEach(t => URL.revokeObjectURL(t.url)); return added; });
+    playAt(0);
+  };
+
   const a = () => audioRef.current;
   const api = {
     tracks,
@@ -251,6 +272,8 @@ function usePlayerState() {
     addFiles,
     playAt,
     loadItems,
+    appendItems,
+    playItems,
     saveAs: (name: string) => savePlaylist({ name, items: toItems(tracks), savedAt: Date.now() }),
     duration: tracks[current]?.duration ?? 0,
     play: () => {

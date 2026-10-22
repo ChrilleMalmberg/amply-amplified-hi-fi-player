@@ -1,5 +1,6 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { snap, type Rect } from "@/lib/winamp-logic";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   id: string;
@@ -10,11 +11,14 @@ type Props = {
   width: number;
   children: ReactNode;
   onContextMenu?: (e: React.MouseEvent) => void;
+  controls?: ReactNode;
 };
 
-export function WaWindow({ id, title, pos, onMove, onClose, width, children, onContextMenu }: Props) {
+export function WaWindow({ id, title, pos, onMove, onClose, width, children, onContextMenu, controls }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [shaded, setShaded] = useState(false);
+  const [layer, setLayer] = useState(1);
+  useEffect(() => { setLayer(Date.now()); }, []);
 
   const onDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("button")) return;
@@ -45,20 +49,22 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
       ref={ref}
       data-wa-win={id}
       className="wa-window"
-      style={{ left: pos.x, top: pos.y, width }}
+      style={{ left: pos.x, top: pos.y, width, zIndex: layer }}
+      onPointerDownCapture={() => setLayer(Date.now())}
       onContextMenu={onContextMenu}
     >
       <div className="wa-titlebar" onPointerDown={onDown} onDoubleClick={() => setShaded((s) => !s)}>
         <span className="wa-title-stripes" />
         <span className="wa-title-text">{title}</span>
         <span className="wa-title-stripes" />
-        <button className="wa-tbtn" aria-label="Shade" onClick={() => setShaded((s) => !s)}>
+        {controls}
+        <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={() => setShaded((s) => !s)}>
           _
-        </button>
+        </Button>
         {onClose && (
-          <button className="wa-tbtn" aria-label="Close" onClick={onClose}>
+          <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Close ${title}`} title="Close window" onClick={onClose}>
             ×
-          </button>
+          </Button>
         )}
       </div>
       {!shaded && children}
