@@ -1,5 +1,6 @@
 import { usePlayer, EQ_LABELS, EQ_PRESETS } from "./player-context";
 import { Button } from "@/components/ui/button";
+import { Settings2 } from "lucide-react";
 
 function VSlider({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
@@ -10,7 +11,7 @@ function VSlider({ value, onChange, label }: { value: number; onChange: (v: numb
         type="range"
         min={-12}
         max={12}
-        step={0.5}
+        step={0.1}
         value={value}
         onChange={(e) => onChange(+e.target.value)}
         onDoubleClick={() => onChange(0)}
@@ -21,7 +22,7 @@ function VSlider({ value, onChange, label }: { value: number; onChange: (v: numb
   );
 }
 
-export function EqualizerWindow() {
+export function EqualizerWindow({ onAdvanced }: { onAdvanced?: () => void }) {
   const p = usePlayer();
   return (
     <div className="wa-eq">
@@ -53,6 +54,7 @@ export function EqualizerWindow() {
       <div className="wa-eq-bottom">
         <span className="wa-eq-scale">-12db</span>
         <span className="wa-eq-preset">{p.eqPresetName ?? "Manual"}</span>
+        {onAdvanced && <Button variant="retro" size="retro" className="wa-toggle" aria-label="Advanced EQ settings" title="Advanced EQ and audio plug-ins" onClick={onAdvanced}><Settings2 size={12} />ADVANCED</Button>}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Check, Ban, Plug, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { audioPluginCatalog, type AudioPluginId } from "@/lib/audio-plugins";
-import { usePlayer, EQ_PRESETS } from "./player-context";
+import { audioPluginCatalog, suggestedPreamp, type AudioPluginId } from "@/lib/audio-plugins";
+import { usePlayer, EQ_PRESETS, EQ_LABELS } from "./player-context";
 import { EqualizerWindow } from "./EqualizerWindow";
 
 export function PluginWindow() {
@@ -14,7 +14,7 @@ export function PluginWindow() {
   const enabled = selected === "equalizer" ? p.eq.on : selected === "balance" ? p.balanceEnabled : false;
   return (
     <section className="wa-plugins" aria-label="Audio plug-in settings">
-      <div className="wa-plugin-host"><Plug size={16} /><span>WEB AUDIO HOST</span><span>2 built-in processors</span></div>
+      <div className="wa-plugin-host"><Plug size={16} /><span>ADVANCED AUDIO SETTINGS</span><span>{Math.round(p.sampleRate / 1000)} kHz output</span></div>
       <div className="wa-plugin-body">
         <nav className="wa-plugin-list" aria-label="Audio plug-ins">
           {catalog.map(item => <Button key={item.id} variant="retro" size="retro" className={`wa-plugin-item ${selected === item.id ? "wa-selected" : ""}`} aria-pressed={selected === item.id} onClick={() => setSelected(item.id)}>
@@ -30,6 +30,17 @@ export function PluginWindow() {
           {plugin.supported && selected === "equalizer" && <>
             <label className="wa-plugin-field">Preset<select className="wa-library-select" aria-label="Equalizer preset" value={p.eqPresetName ?? "Manual"} onChange={e => p.applyEqPreset(e.target.value)}><option value="Manual" disabled>Manual</option>{Object.keys(EQ_PRESETS).map(name => <option key={name}>{name}</option>)}</select></label>
             <EqualizerWindow />
+            <div className="wa-eq-advanced" aria-label="Precise equalizer settings">
+              <div className="wa-eq-numbers">
+                <label>Preamp · dB<input className="wa-eq-number" aria-label="Preamp gain in dB" type="number" min={-12} max={12} step={0.1} value={p.eq.preamp} onChange={e => { if (e.target.value !== "") p.setEqPreamp(Number(e.target.value)); }} /></label>
+                {p.eq.bands.map((gain, i) => <label key={i}>{EQ_LABELS[i]} Hz · dB<input className="wa-eq-number" aria-label={`${EQ_LABELS[i]} gain in dB`} type="number" min={-12} max={12} step={0.1} value={gain} onChange={e => { if (e.target.value !== "") p.setEqBand(i, Number(e.target.value)); }} /></label>)}
+              </div>
+              <div className="wa-eq-actions">
+                <Button variant="retro" size="retro" className="wa-toggle" title="Lower preamp to offset the largest band boost" onClick={() => p.setEqPreamp(suggestedPreamp(p.eq.bands))}>HEADROOM</Button>
+                <Button variant="retro" size="retro" className="wa-toggle" aria-label="Reset EQ gains" onClick={p.resetEq}><RotateCcw size={12} />FLAT</Button>
+              </div>
+              <div className="wa-eq-headroom">Suggested preamp: {suggestedPreamp(p.eq.bands).toFixed(1)} dB · not a clipping guarantee</div>
+            </div>
           </>}
           {plugin.supported && selected === "balance" && <div className="wa-plugin-balance">
             <label htmlFor="plugin-balance">Stereo balance</label>
@@ -39,7 +50,7 @@ export function PluginWindow() {
           </div>}
         </div>
       </div>
-      <div className="wa-plugin-footer">Native plug-in hosting: unavailable in web and current Windows editions</div>
+      <div className="wa-plugin-footer">Audio enhancement plug-ins: available later · Native plug-in hosting: unavailable in this version</div>
     </section>
   );
 }

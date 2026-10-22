@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { audioPluginCatalog, applyEqualizer, effectiveBalance } from "@/lib/audio-plugins";
+import { audioPluginCatalog, applyEqualizer, effectiveBalance, normalizeEqGain, suggestedPreamp } from "@/lib/audio-plugins";
 
 describe("platform plug-in support", () => {
   it("supports only the implemented Web Audio processors", () => {
@@ -7,6 +7,21 @@ describe("platform plug-in support", () => {
   });
   it("disables processors when the runtime cannot supply them", () => {
     expect(audioPluginCatalog({ equalizer: false, balance: false }).some(p => p.supported)).toBe(false);
+  });
+  it("keeps future audio enhancements unavailable", () => {
+    expect(audioPluginCatalog({ equalizer: true, balance: true }).find(p => p.id === "enhancements")?.supported).toBe(false);
+  });
+});
+
+describe("advanced EQ values", () => {
+  it("keeps precise gain adjustments within the existing EQ range", () => {
+    expect(normalizeEqGain(3.7)).toBe(3.7);
+    expect(normalizeEqGain(99)).toBe(12);
+    expect(normalizeEqGain(-99)).toBe(-12);
+    expect(normalizeEqGain(Number.NaN)).toBe(0);
+  });
+  it("suggests preamp attenuation matching the largest band boost", () => {
+    expect(suggestedPreamp([3, -2, 7.5])).toBe(-7.5);
   });
 });
 
