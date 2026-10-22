@@ -3,3 +3,4 @@
 - [x] Support all browser-playable audio formats with clean full-quality playback
 - [x] Save/restore playlists between visits (auto-restore queue + named playlists)
 - [ ] Package as a Windows 11 desktop app
+- [ ] Installable Windows setup .exe
