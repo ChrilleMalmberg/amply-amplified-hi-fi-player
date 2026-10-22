@@ -1,3 +1,4 @@
+import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { nextIndex, prevIndex, readTags } from "@/lib/winamp-logic";
 import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/playlist-store";
@@ -38,7 +39,9 @@ export const AUDIO_EXT = /\.(mp3|flac|wav|wave|ogg|oga|opus|m4a|mp4|aac|aif|aiff
 export const AUDIO_ACCEPT = "audio/*,.mp3,.flac,.wav,.ogg,.oga,.opus,.m4a,.aac,.aif,.aiff,.webm,.weba,.caf,.mka";
 
 type Ctx = ReturnType<typeof usePlayerState>;
-const PlayerCtx = createContext<Ctx | null>(null);
+// Keep one context instance across hot reloads so provider and consumers always match.
+const g = globalThis as unknown as { __llamampPlayerCtx?: React.Context<Ctx | null> };
+const PlayerCtx = (g.__llamampPlayerCtx ??= createContext<Ctx | null>(null));
 export const usePlayer = () => {
   const c = useContext(PlayerCtx);
   if (!c) throw new Error("no player");
