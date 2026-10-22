@@ -11,3 +11,5 @@
 - [x] Independent source browser windows with queue actions
 - [x] Top-right compact / full-size player controls
 - [x] Verify library import, persistence, source windows and size switching
+- [ ] Add plug-in settings with platform-aware support, live controls and saved settings
+- [ ] Verify plug-in toggles, configuration and playback
