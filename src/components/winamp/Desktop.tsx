@@ -7,12 +7,13 @@ import { EqualizerWindow } from "./EqualizerWindow";
 import { IntroSplash } from "./IntroSplash";
 import { LibraryWindow } from "./LibraryWindow";
 import { useMusicLibrary } from "./use-music-library";
+import { PluginWindow } from "./PluginWindow";
 import { Button } from "@/components/ui/button";
-import { Library, Minimize2, Maximize2, Columns2 } from "lucide-react";
+import { Library, Minimize2, Maximize2, Columns2, Plug } from "lucide-react";
 
 const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
-const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 236 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 560 } };
+const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 236 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 560 }, plugins: { x: 32, y: 80 } };
 
 function Shell() {
   const p = usePlayer();
@@ -21,6 +22,7 @@ function Shell() {
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
   const [show, setShow] = useState({ pl: true, vis: true, eq: true });
   const [menu, setMenu] = useState<Pos | null>(null);
+  const [showPlugins, setShowPlugins] = useState(false);
   const library = useMusicLibrary();
   const [mode, setMode] = useState<"small" | "large">("large");
   const [browsers, setBrowsers] = useState([{ id: "library", source: "" }]);
@@ -71,6 +73,7 @@ function Shell() {
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
       <WaWindow id="main" title="AMPLY · HIFI PLAYER" pos={mode === "small" ? DEFAULT.main : pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
         controls={<>
+          <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Open plug-in settings" title="Audio plug-ins" onClick={() => { setMode("large"); setShowPlugins(true); }}><Plug /></Button>
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Open music library" title="Music library" onClick={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }}><Library /></Button>
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Compact player" title="Compact player" onClick={() => setMode("small")}><Minimize2 /></Button>
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Full player" title="Full player" onClick={() => setMode("large")}><Maximize2 /></Button>
@@ -79,6 +82,7 @@ function Shell() {
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
+      {mode === "large" && showPlugins && <WaWindow id="plugins" title="AUDIO PLUG-INS" width={680} pos={pos["plugins"] ?? DEFAULT.plugins} onMove={mv("plugins")} onClose={() => setShowPlugins(false)}><PluginWindow /></WaWindow>}
       {mode === "large" && show.pl && (
         <WaWindow id="pl" title="PLAYLIST" pos={pos["pl"] ?? DEFAULT.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
           <PlaylistWindow />

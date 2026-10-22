@@ -13,3 +13,4 @@
 - Desktop app: `bun run package:win` builds a static SPA via vite.electron.config.ts (bypasses the Cloudflare/SSR wrapper) and Electron serves it from 127.0.0.1:47823; keep the port fixed so saved playlists (stored per address) persist. Installer: makensis electron/installer.nsi.
 - Playlists persist in IndexedDB with the original file bytes (src/lib/playlist-store.ts) so they work offline and in the desktop app.
 - Music library imports use browser-safe music-metadata and a reserved IndexedDB library record with original bytes; source windows share the catalog but keep independent filters, so offline browsing never moves users' original folders.
+- Plug-in settings use a capability catalog in src/lib/audio-plugins.ts and the existing player processors, never simulated native hosting; shared player state keeps EQ and balance controls synchronized and persists balance locally for offline use.
