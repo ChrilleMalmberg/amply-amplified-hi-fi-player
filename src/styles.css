@@ -188,7 +188,7 @@
 .wa-meta { display: flex; gap: 6px; align-items: center; font-size: 18px; }
 .wa-small { padding: 0 6px; font-size: 18px; }
 .wa-grow { flex: 1; }
-.wa-label { color: var(--wa-hi); font-family: "Silkscreen", monospace; font-size: 10px; }
+.wa-label { color: var(--wa-lo); font-family: "Silkscreen", monospace; font-size: 10px; }
 .wa-label.wa-on, .wa-toggle.wa-on { color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
 .wa-sliders { display: flex; gap: 8px; align-items: center; }
 .wa-range { appearance: none; height: 10px; flex: 1; background: linear-gradient(to right, var(--wa-lo), var(--wa-lcd-text)); border: 1px solid var(--wa-lo); }
@@ -236,3 +236,16 @@
 .wa-plm-actions { display: flex; gap: 4px; }
 .wa-input { outline: none; font-family: inherit; }
 .wa-input::placeholder { color: var(--wa-hi); }
+
+/* ===== Equalizer window ===== */
+.wa-eq { padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.wa-eq-top { display: flex; align-items: center; justify-content: space-between; }
+.wa-eq-mid, .wa-eq-bottom { display: flex; align-items: center; justify-content: space-between; }
+.wa-eq-scale { font-family: "Silkscreen", monospace; font-size: 10px; color: var(--wa-lo); }
+.wa-eq-sliders { display: flex; gap: 2px; justify-content: space-between; }
+.wa-eq-col { position: relative; width: 46px; height: 148px; }
+.wa-eq-slider { position: absolute; left: 50%; top: 62px; width: 116px; height: 12px; transform: translate(-50%, -50%) rotate(-90deg); appearance: none; background: linear-gradient(to right, var(--wa-lo), var(--wa-lcd-text)); border: 1px solid var(--wa-lo); }
+.wa-eq-slider::-webkit-slider-thumb { appearance: none; width: 14px; height: 20px; background: linear-gradient(to bottom, var(--wa-hi), var(--wa-face) 60%, var(--wa-lo)); border: 1px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+.wa-eq-slider::-moz-range-thumb { width: 14px; height: 20px; background: var(--wa-face); border-radius: 0; }
+.wa-eq-label { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-family: "Silkscreen", monospace; font-size: 9px; color: var(--wa-lo); }
+.wa-eq-preset { font-size: 18px; color: var(--wa-btn-text); }
