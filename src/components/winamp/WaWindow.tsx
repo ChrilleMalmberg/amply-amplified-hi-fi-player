@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { snap, type Rect } from "@/lib/winamp-logic";
 import { Button } from "@/components/ui/button";
 import { Link2, Unlink, MoveDiagonal2 } from "lucide-react";
-import { bounds, connectedWindows, resizeWindows, type WindowRect } from "@/lib/window-layout";
+import { connectedWindows, resizeWindows, type WindowRect } from "@/lib/window-layout";
 import { useWindowWorkspace } from "./WindowWorkspace";
 
 let nextWindowLayer = 1;
