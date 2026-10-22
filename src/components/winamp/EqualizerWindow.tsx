@@ -33,7 +33,7 @@ export function EqualizerWindow() {
           onClick={() => {
             const names = Object.keys(EQ_PRESETS);
             const i = names.indexOf(p.eqPresetName ?? "");
-            p.applyEqPreset(names[(i + 1) % names.length]);
+            p.applyEqPreset(names[(i + 1) % names.length] ?? "Flat");
           }}
         >
           PRESETS
@@ -45,7 +45,7 @@ export function EqualizerWindow() {
       <div className="wa-eq-sliders">
         <VSlider value={p.eq.preamp} onChange={p.setEqPreamp} label="PREAMP" />
         {p.eq.bands.map((v, i) => (
-          <VSlider key={EQ_LABELS[i]} value={v} onChange={(nv) => p.setEqBand(i, nv)} label={EQ_LABELS[i]} />
+          <VSlider key={i} value={v} onChange={(nv) => p.setEqBand(i, nv)} label={EQ_LABELS[i] ?? ""} />
         ))}
       </div>
       <div className="wa-eq-bottom">

@@ -73,17 +73,18 @@ function decodeText(data: Uint8Array) {
 export async function readTags(file: File): Promise<{ title?: string; artist?: string }> {
   const buf = new Uint8Array(await file.slice(0, 256 * 1024).arrayBuffer());
   if (buf[0] !== 0x49 || buf[1] !== 0x44 || buf[2] !== 0x33) return {};
+  const B = (i: number) => buf[i] ?? 0;
   const ver = buf[3];
   const ss = (i: number) =>
-    ((buf[i] & 127) << 21) | ((buf[i + 1] & 127) << 14) | ((buf[i + 2] & 127) << 7) | (buf[i + 3] & 127);
+    ((B(i) & 127) << 21) | ((B(i + 1) & 127) << 14) | ((B(i + 2) & 127) << 7) | (B(i + 3) & 127);
   const end = Math.min(10 + ss(6), buf.length);
   let p = 10;
   const out: { title?: string; artist?: string } = {};
   while (p + 10 < end) {
-    const id = String.fromCharCode(buf[p], buf[p + 1], buf[p + 2], buf[p + 3]);
+    const id = String.fromCharCode(B(p), B(p + 1), B(p + 2), B(p + 3));
     if (!/^[A-Z0-9]{4}$/.test(id)) break;
     const fs =
-      ver === 4 ? ss(p + 4) : ((buf[p + 4] << 24) | (buf[p + 5] << 16) | (buf[p + 6] << 8) | buf[p + 7]) >>> 0;
+      ver === 4 ? ss(p + 4) : ((B(p + 4) << 24) | (B(p + 5) << 16) | (B(p + 6) << 8) | B(p + 7)) >>> 0;
     const data = buf.slice(p + 10, p + 10 + fs);
     if (id === "TIT2") out.title = decodeText(data);
     if (id === "TPE1") out.artist = decodeText(data);
