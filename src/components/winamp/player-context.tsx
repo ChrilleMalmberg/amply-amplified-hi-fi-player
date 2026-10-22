@@ -35,8 +35,8 @@ function applyEqToGraph(pre: GainNode, bands: BiquadFilterNode[], eq: EqState) {
   bands.forEach((bq, i) => (bq.gain.value = eq.on ? (eq.bands[i] ?? 0) : 0));
 }
 
-export const AUDIO_EXT = /\.(mp3|flac|wav|wave|ogg|oga|opus|m4a|mp4|aac|aif|aiff|webm|weba|caf|alac|mka)$/i;
-export const AUDIO_ACCEPT = "audio/*,.mp3,.flac,.wav,.ogg,.oga,.opus,.m4a,.aac,.aif,.aiff,.webm,.weba,.caf,.mka";
+export const AUDIO_EXT = /\.(mp3|mp2|mpga|flac|wav|wave|bwf|ogg|oga|opus|spx|m4a|m4b|mp4|aac|adts|aif|aiff|aifc|webm|weba|caf|alac|mka|wma|ape|wv|mpc|tta|dsf|dff|ac3|eac3|dts|amr|3gp|3ga|au|snd|mid|midi)$/i;
+export const AUDIO_ACCEPT = "audio/*,.mp3,.mp2,.mpga,.flac,.wav,.bwf,.ogg,.oga,.opus,.spx,.m4a,.m4b,.mp4,.aac,.adts,.aif,.aiff,.aifc,.webm,.weba,.caf,.alac,.mka,.wma,.ape,.wv,.mpc,.tta,.dsf,.dff,.ac3,.eac3,.dts,.amr,.3gp,.3ga,.au,.snd,.mid,.midi";
 
 type Ctx = ReturnType<typeof usePlayerState>;
 // Keep one context instance across hot reloads so provider and consumers always match.

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePlayer, AUDIO_ACCEPT } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
+import bolt from "@/assets/bolt-icon.svg";
 
 function cssVar(el: Element, n: string) {
   return getComputedStyle(el).getPropertyValue(n).trim();
@@ -98,8 +99,14 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
             <span className={`wa-label ${t ? "wa-on" : ""}`}>stereo</span>
           </div>
           <div className="wa-sliders">
-            <input aria-label="Volume" className="wa-range" type="range" min={0} max={1} step={0.01} value={p.volume} onChange={(e) => p.setVolume(+e.target.value)} />
-            <input aria-label="Balance" className="wa-range wa-balance" type="range" min={-1} max={1} step={0.02} value={p.balance} onChange={(e) => p.setBalance(+e.target.value)} onDoubleClick={() => p.setBalance(0)} />
+            <div className="wa-slwrap">
+              <input aria-label="Volume" className="wa-range" type="range" min={0} max={1} step={0.01} value={p.volume} onChange={(e) => p.setVolume(+e.target.value)} />
+              <span className="wa-slval">VOL {p.volume <= 0.001 ? "-∞" : (20 * Math.log10(p.volume)).toFixed(1)} dB</span>
+            </div>
+            <div className="wa-slwrap wa-balance">
+              <input aria-label="Balance" className="wa-range" type="range" min={-1} max={1} step={0.02} value={p.balance} onChange={(e) => p.setBalance(+e.target.value)} onDoubleClick={() => p.setBalance(0)} />
+              <span className="wa-slval">BAL {Math.round(p.balance * 100) === 0 ? "0" : `${p.balance > 0 ? "+" : ""}${Math.round(p.balance * 100)}`}</span>
+            </div>
             <button className={`wa-toggle ${p.eq.on ? "wa-on" : ""}`} onClick={onToggleEQ}>EQ</button>
             <button className="wa-toggle" onClick={onTogglePL}>PL</button>
           </div>
@@ -116,7 +123,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
         <span className="wa-spacer" />
         <button className={`wa-toggle ${p.shuffle ? "wa-on" : ""}`} onClick={p.toggleShuffle}>SHUFFLE</button>
         <button className={`wa-toggle ${p.repeat ? "wa-on" : ""}`} onClick={p.toggleRepeat}>↻</button>
-        <span className="wa-logo">⚡</span>
+        <img src={bolt} alt="Ampli Player" className="wa-logo" width={26} height={26} />
       </div>
     </div>
   );

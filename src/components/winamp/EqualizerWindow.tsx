@@ -15,6 +15,7 @@ function VSlider({ value, onChange, label }: { value: number; onChange: (v: numb
         onDoubleClick={() => onChange(0)}
       />
       <span className="wa-eq-label">{label}</span>
+      <span className="wa-eq-val">{value > 0 ? "+" : ""}{value.toFixed(1)}</span>
     </div>
   );
 }

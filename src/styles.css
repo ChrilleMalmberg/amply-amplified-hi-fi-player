@@ -171,13 +171,14 @@
 /* Silver Matrix (default): silver frame, titles & buttons; black-green panels with green text */
 .wa-desktop[data-skin="silver"] {
   --wa-desk: oklch(0.1 0.01 150);
-  --wa-face: oklch(0.8 0.005 250);
-  --wa-hi: oklch(0.96 0 0);
-  --wa-lo: oklch(0.45 0.01 250);
+  --wa-face: oklch(0.66 0.005 250);
+  --wa-hi: oklch(0.86 0 0);
+  --wa-lo: oklch(0.36 0.01 250);
   --wa-lcd: oklch(0.13 0.025 150);
   --wa-lcd-text: oklch(0.85 0.24 145);
   --wa-title: oklch(0.18 0.01 250);
-  --wa-title-bg: linear-gradient(to bottom, oklch(0.94 0 0), oklch(0.74 0.005 250));
+  --wa-title-bg: linear-gradient(to bottom, oklch(0.8 0 0), oklch(0.6 0.005 250));
+  --wa-orange: oklch(0.74 0.19 55);
   --wa-sel: oklch(0.32 0.09 145);
   --wa-cur: oklch(0.97 0.08 140);
   --wa-btn-text: oklch(0.18 0.01 250);
@@ -198,7 +199,7 @@
 .wa-desktop[data-skin="silver"] .wa-eq-label { color: color-mix(in oklab, var(--wa-lcd-text) 70%, transparent); }
 .wa-desktop[data-skin="silver"] .wa-eq-preset { color: var(--wa-lcd-text); }
 .wa-desktop[data-skin="silver"] .wa-toggle.wa-on { color: var(--wa-lcd-text); background: var(--wa-lcd); text-shadow: 0 0 4px var(--wa-lcd-text); }
-.wa-desktop[data-skin="silver"] .wa-title-text { font-weight: bold; }
+.wa-desktop[data-skin="silver"] .wa-title-text { font-weight: bold; color: var(--wa-orange); text-shadow: 0 1px 0 oklch(0.2 0 0); }
 .wa-desktop[data-skin="silver"] .wa-range,
 .wa-desktop[data-skin="silver"] .wa-eq-slider { background: linear-gradient(to right, oklch(0.2 0.04 145), var(--wa-lcd-text)); }
 .wa-desktop[data-skin="silver"] .wa-pl-empty { color: var(--wa-lcd-text); }
@@ -237,7 +238,7 @@
 .wa-eject { margin-left: 8px; width: 40px; }
 .wa-toggle { font-family: "Silkscreen", monospace; font-size: 10px; padding: 3px 6px; color: var(--wa-btn-text); background: linear-gradient(to bottom, var(--wa-hi), var(--wa-face)); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 .wa-spacer { flex: 1; }
-.wa-logo { font-size: 20px; color: var(--wa-title); }
+.wa-logo { width: 26px; height: 26px; margin-left: 4px; }
 .wa-blink { animation: wa-blink 1s steps(1) infinite; }
 @keyframes wa-blink { 50% { opacity: 0; } }
 
@@ -278,10 +279,16 @@
 .wa-eq-mid, .wa-eq-bottom { display: flex; align-items: center; justify-content: space-between; }
 .wa-eq-scale { font-family: "Silkscreen", monospace; font-size: 10px; color: var(--wa-lo); }
 .wa-eq-sliders { display: flex; gap: 2px; justify-content: space-between; }
-.wa-eq-col { position: relative; width: 46px; height: 148px; }
+.wa-eq-col { position: relative; width: 46px; height: 164px; }
 .wa-eq-slider { position: absolute; left: 50%; top: 62px; width: 116px; height: 12px; transform: translate(-50%, -50%) rotate(-90deg); appearance: none; background: linear-gradient(to right, var(--wa-lo), var(--wa-lcd-text)); border: 1px solid var(--wa-lo); }
 .wa-eq-slider::-webkit-slider-thumb { appearance: none; width: 14px; height: 20px; background: linear-gradient(to bottom, var(--wa-hi), var(--wa-face) 60%, var(--wa-lo)); border: 1px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 .wa-eq-slider::-moz-range-thumb { width: 14px; height: 20px; background: var(--wa-face); border-radius: 0; }
-.wa-eq-label { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-family: "Silkscreen", monospace; font-size: 9px; color: var(--wa-lo); }
+.wa-eq-label { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-family: "Silkscreen", monospace; font-size: 9px; color: var(--wa-lo); }
 .wa-eq-preset { font-size: 18px; color: var(--wa-btn-text); }
 .wa-desktop[data-skin="silver"] .wa-hint { color: var(--wa-lcd-text); }
+.wa-eq-val { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-size: 15px; color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
+.wa-slwrap { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wa-slwrap.wa-balance { flex: .6; background: none; }
+.wa-slwrap .wa-range { flex: none; width: 100%; }
+.wa-slwrap.wa-balance .wa-range { background: linear-gradient(to right, var(--wa-lcd-text), var(--wa-lo), var(--wa-lcd-text)); }
+.wa-slval { font-size: 15px; line-height: 14px; text-align: center; color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
