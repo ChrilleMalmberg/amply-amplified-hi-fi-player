@@ -396,7 +396,7 @@
 .wa-window-content > .wa-plugins { flex: 1; }
 .wa-window-content > .wa-eq .wa-eq-sliders { flex: 1; min-height: 150px; }
 .wa-window-content > .wa-eq .wa-eq-col { height: auto; width: 8%; }
-.wa-window-content > .wa-eq .wa-eq-slider { position: static; writing-mode: vertical-lr; direction: rtl; transform: none; width: 12px; height: calc(100% - 40px); margin: 0 auto; display: block; }
+.wa-window-content > .wa-eq .wa-eq-slider { position: absolute; writing-mode: vertical-lr; direction: rtl; transform: translateX(-50%); left: 50%; top: 0; width: 12px; height: calc(100% - 40px); margin: 0; display: block; }
 .wa-resize-edge { position: absolute; touch-action: none; z-index: 2; }
 .wa-resize-right { right: -2px; top: 26px; bottom: 16px; width: 6px; cursor: ew-resize; }
 .wa-resize-bottom { bottom: -2px; left: 0; right: 16px; height: 6px; cursor: ns-resize; }
