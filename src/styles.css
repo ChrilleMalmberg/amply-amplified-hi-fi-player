@@ -263,7 +263,6 @@
 .wa-hint { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; color: var(--wa-title); font-size: 18px; opacity: .7; pointer-events: none; }
 
 .wa-intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--wa-lcd); color: var(--wa-lcd-text); }
-.wa-intro-llama { width: 260px; height: auto; image-rendering: pixelated; }
 .wa-intro-title { font-family: "Silkscreen", monospace; font-size: 56px; color: var(--wa-title); letter-spacing: 8px; }
 .wa-intro-sub { font-size: 32px; }
 .wa-intro-click { margin-top: 16px; font-size: 22px; color: var(--wa-hi); }
@@ -293,3 +292,7 @@
 .wa-slwrap.wa-balance .wa-range { background: linear-gradient(to right, var(--wa-lcd-text), var(--wa-lo), var(--wa-lcd-text)); }
 .wa-slval { font-size: 15px; line-height: 14px; text-align: center; color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
 @media (max-width: 700px) { .wa-hint { display: none; } }
+.amply-logo { display: inline-flex; align-items: center; gap: 0.25em; font-family: "Silkscreen", monospace; line-height: 1; }
+.amply-name { color: var(--wa-title); letter-spacing: 0.04em; }
+.amply-name b { font-weight: inherit; color: var(--wa-lcd-text); }
+.amply-hifi { font-size: 0.42em; padding: 0.15em 0.35em; border: 0.12em solid var(--wa-title); color: var(--wa-title); letter-spacing: 0.1em; }

@@ -1,4 +1,4 @@
-// Llamamp desktop shell. Serves the static build from a private local server
+// AmPly desktop shell. Serves the static build from a private local server
 // (127.0.0.1, random port) so storage, audio and routing behave exactly like the web app.
 const { app, BrowserWindow, Menu, shell } = require("electron");
 const http = require("http");
@@ -39,7 +39,7 @@ async function createWindow() {
     useContentSize: true,
     resizable: true,
     backgroundColor: "#0b130e",
-    title: "HiFi Ampli Player V-2.1",
+    title: "AmPly HiFi Player V-2.1",
     icon: path.join(__dirname, "icon.ico"),
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, nodeIntegration: false, autoplayPolicy: "no-user-gesture-required" },

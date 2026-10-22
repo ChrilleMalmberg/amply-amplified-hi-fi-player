@@ -55,7 +55,7 @@ function Shell() {
   return (
     <div className="wa-desktop" data-skin={skin} onClick={() => setMenu(null)}>
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
-      <WaWindow id="main" title="HIFI AMPLI PLAYER" pos={pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
+      <WaWindow id="main" title="AMPLY · HIFI PLAYER" pos={pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
