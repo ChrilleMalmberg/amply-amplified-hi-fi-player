@@ -73,12 +73,25 @@ function usePlayerState() {
       const an = ctx.createAnalyser();
       an.fftSize = 2048;
       an.smoothingTimeConstant = 0.7;
-      // Clean path: source -> panner (passthrough at 0) -> speakers. Analyser is a side tap only.
-      src.connect(pan).connect(ctx.destination);
+      // Path: source -> EQ (preamp + 10 peaking bands) -> panner -> speakers.
+      // Analyser stays a side tap only, so visuals never alter sound quality.
+      const pre = ctx.createGain();
+      const bands = EQ_FREQS.map((f) => {
+        const bq = ctx.createBiquadFilter();
+        bq.type = "peaking";
+        bq.frequency.value = f;
+        bq.Q.value = 1.1; // musical, low-phase-smear curve
+        return bq;
+      });
+      src.connect(pre);
+      bands.reduce((prev, bq) => (prev.connect(bq), bq), pre as AudioNode).connect(pan).connect(ctx.destination);
       pan.connect(an);
       ctxRef.current = ctx;
       analyserRef.current = an;
       pannerRef.current = pan;
+      eqPreampRef.current = pre;
+      eqBandsRef.current = bands;
+      applyEqToGraph(pre, bands, loadEq());
       setSampleRate(ctx.sampleRate);
     }
     void ctxRef.current.resume();
