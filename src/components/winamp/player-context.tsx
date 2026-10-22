@@ -53,6 +53,7 @@ function usePlayerState() {
   const eqPreampRef = useRef<GainNode | null>(null);
   const eqBandsRef = useRef<BiquadFilterNode[]>([]);
   const [eq, setEq] = useState<EqState>(loadEq);
+  const [eqPresetName, setEqPresetName] = useState<string | null>(null);
   const idRef = useRef(1);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [current, setCurrent] = useState(-1);
@@ -300,12 +301,22 @@ function usePlayerState() {
     toggleShuffle: () => setShuffle((s) => !s),
     toggleRepeat: () => setRepeat((s) => !s),
     eq,
+    eqPresetName,
     setEqOn: (on: boolean) => updateEq({ ...eq, on }),
-    setEqBand: (i: number, v: number) => updateEq({ ...eq, bands: eq.bands.map((b, k) => (k === i ? v : b)) }),
-    setEqPreamp: (v: number) => updateEq({ ...eq, preamp: v }),
+    setEqBand: (i: number, v: number) => {
+      setEqPresetName(null);
+      updateEq({ ...eq, bands: eq.bands.map((b, k) => (k === i ? v : b)) });
+    },
+    setEqPreamp: (v: number) => {
+      setEqPresetName(null);
+      updateEq({ ...eq, preamp: v });
+    },
     applyEqPreset: (name: string) => {
       const pr = EQ_PRESETS[name];
-      if (pr) updateEq({ on: true, preamp: pr.preamp, bands: [...pr.bands] });
+      if (pr) {
+        setEqPresetName(name);
+        updateEq({ on: true, preamp: pr.preamp, bands: [...pr.bands] });
+      }
     },
   };
   return api;
