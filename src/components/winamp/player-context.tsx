@@ -4,6 +4,30 @@ import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/pl
 
 export type Track = { id: number; file: File; url: string; title: string; duration: number };
 
+/** Winamp 2.x equalizer bands (Hz). */
+export const EQ_FREQS = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
+export const EQ_LABELS = ["60", "170", "310", "600", "1K", "3K", "6K", "12K", "14K", "16K"];
+export const EQ_PRESETS: Record<string, { preamp: number; bands: number[] }> = {
+  Flat: { preamp: 0, bands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+  Rock: { preamp: 0, bands: [5, 3.5, -5.5, -8, -3, 4, 9, 11, 11, 10] },
+  Pop: { preamp: 0, bands: [-1, 3, 7, 7, 5, 0, -2, -2, -1, -1] },
+  Jazz: { preamp: 0, bands: [4, 3, 1, 2, -2, -2, 0, 2, 3, 4] },
+  Classical: { preamp: 0, bands: [5, 3, 0, 0, 0, 0, -4, -4, 0, 6] },
+  "Bass boost": { preamp: 0, bands: [9, 7, 5, 2, 0, 0, 0, 0, 0, 0] },
+  "Treble boost": { preamp: 0, bands: [0, 0, 0, 0, 0, 2, 5, 8, 9, 10] },
+  Vocal: { preamp: 0, bands: [-2, -4, -4, 1, 4, 6, 5, 3, 1, 0] },
+};
+const EQ_KEY = "llamamp-eq";
+type EqState = { on: boolean; preamp: number; bands: number[] };
+const EQ_DEFAULT: EqState = { on: false, preamp: 0, bands: new Array(10).fill(0) };
+function loadEq(): EqState {
+  try {
+    const s = JSON.parse(localStorage.getItem(EQ_KEY) || "null");
+    if (s && Array.isArray(s.bands) && s.bands.length === 10) return { on: !!s.on, preamp: +s.preamp || 0, bands: s.bands.map((v: unknown) => +v || 0) };
+  } catch { /* ignore */ }
+  return EQ_DEFAULT;
+}
+
 export const AUDIO_EXT = /\.(mp3|flac|wav|wave|ogg|oga|opus|m4a|mp4|aac|aif|aiff|webm|weba|caf|alac|mka)$/i;
 export const AUDIO_ACCEPT = "audio/*,.mp3,.flac,.wav,.ogg,.oga,.opus,.m4a,.aac,.aif,.aiff,.webm,.weba,.caf,.mka";
 
@@ -20,6 +44,9 @@ function usePlayerState() {
   const ctxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const pannerRef = useRef<StereoPannerNode | null>(null);
+  const eqPreampRef = useRef<GainNode | null>(null);
+  const eqBandsRef = useRef<BiquadFilterNode[]>([]);
+  const [eq, setEq] = useState<EqState>(loadEq);
   const idRef = useRef(1);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [current, setCurrent] = useState(-1);
