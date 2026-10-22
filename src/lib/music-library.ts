@@ -7,15 +7,15 @@ export function fileIdentity(file: File, folder = "") {
   return `${folder}/${file.name}:${file.size}:${file.lastModified}`;
 }
 
-export function organizeFile(file: File, tags: { title?: string; artist?: string; album?: string; genre?: string[]; duration?: number; track?: { no: number | null } }): StoredItem {
+export function organizeFile(file: File, tags: { title?: string; artist?: string; album?: string; genre?: string[]; duration?: number | undefined; track?: { no: number | null } }): StoredItem {
   const path = file.webkitRelativePath || file.name;
   const parts = path.split("/");
   const folder = parts.slice(0, -1).join("/") || "Loose files";
   return {
-    file, folder, source: parts.length > 1 ? parts[0] : "Loose files",
+    file, folder, source: parts.length > 1 ? parts[0] ?? "Loose files" : "Loose files",
     title: tags.title || file.name.replace(/\.[^.]+$/, ""),
-    artist: tags.artist || (parts.length >= 4 ? parts[parts.length - 3] : "Unknown artist"),
-    album: tags.album || (parts.length >= 3 ? parts[parts.length - 2] : "Unknown album"),
+    artist: tags.artist || (parts.length >= 4 ? parts[parts.length - 3] : undefined) || "Unknown artist",
+    album: tags.album || (parts.length >= 3 ? parts[parts.length - 2] : undefined) || "Unknown album",
     genre: tags.genre?.join(", ") || "Uncategorized",
     duration: Number.isFinite(tags.duration) ? tags.duration ?? 0 : 0,
     trackNumber: tags.track?.no ?? 0,
