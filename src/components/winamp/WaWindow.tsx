@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { snap, type Rect } from "@/lib/winamp-logic";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +18,7 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
   const ref = useRef<HTMLDivElement>(null);
   const [shaded, setShaded] = useState(false);
   const [layer, setLayer] = useState(1);
+  useEffect(() => { setLayer(Date.now()); }, []);
 
   const onDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("button")) return;
