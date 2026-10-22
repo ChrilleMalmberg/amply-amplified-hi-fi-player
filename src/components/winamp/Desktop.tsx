@@ -8,15 +8,18 @@ import { IntroSplash } from "./IntroSplash";
 import { LibraryWindow } from "./LibraryWindow";
 import { useMusicLibrary } from "./use-music-library";
 import { PluginWindow } from "./PluginWindow";
+import { WindowWorkspace, useWindowWorkspace } from "./WindowWorkspace";
 import { Button } from "@/components/ui/button";
 import { Library, Minimize2, Maximize2, Columns2, Plug } from "lucide-react";
 
 const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
-const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 236 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 560 }, plugins: { x: 32, y: 80 } };
+const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 528 }, plugins: { x: 32, y: 80 } };
 
 function Shell() {
   const p = usePlayer();
+  const workspace = useWindowWorkspace();
+  const arrange = () => { workspace?.reset(); setPos(DEFAULT); };
   const [intro, setIntro] = useState(true);
   const [skin, setSkin] = useState<string>("silver");
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
@@ -50,7 +53,7 @@ function Shell() {
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === "INPUT" && (e.target as HTMLInputElement).type !== "range") return;
+      if ((e.target as HTMLElement).closest("input, select, textarea, [aria-label^='Resize']")) return;
       const m: Record<string, () => void> = {
         z: p.prev, x: p.play, c: p.pause, v: p.stop, b: p.next,
         ArrowLeft: () => p.seek(p.time - 5), ArrowRight: () => p.seek(p.time + 5),
@@ -77,12 +80,12 @@ function Shell() {
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Open music library" title="Music library" onClick={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }}><Library /></Button>
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Compact player" title="Compact player" onClick={() => setMode("small")}><Minimize2 /></Button>
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Full player" title="Full player" onClick={() => setMode("large")}><Maximize2 /></Button>
-          <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Arrange windows" title="Arrange windows" onClick={() => setPos(DEFAULT)}><Columns2 /></Button>
+          <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Arrange windows" title="Arrange windows" onClick={arrange}><Columns2 /></Button>
         </>}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
-      {mode === "large" && showPlugins && <WaWindow id="plugins" title="AUDIO PLUG-INS" width={680} pos={pos["plugins"] ?? DEFAULT.plugins} onMove={mv("plugins")} onClose={() => setShowPlugins(false)}><PluginWindow /></WaWindow>}
+      {mode === "large" && showPlugins && <WaWindow id="plugins" title="ADVANCED EQ · AUDIO PLUG-INS" width={760} pos={pos["plugins"] ?? DEFAULT.plugins} onMove={mv("plugins")} onClose={() => setShowPlugins(false)}><PluginWindow /></WaWindow>}
       {mode === "large" && show.pl && (
         <WaWindow id="pl" title="PLAYLIST" pos={pos["pl"] ?? DEFAULT.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
           <PlaylistWindow />
@@ -90,7 +93,7 @@ function Shell() {
       )}
       {mode === "large" && show.eq && (
         <WaWindow id="eq" title="EQUALIZER" pos={pos["eq"] ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
-          <EqualizerWindow />
+          <EqualizerWindow onAdvanced={() => setShowPlugins(true)} />
         </WaWindow>
       )}
       {mode === "large" && browsers.map((browser, i) => <WaWindow key={browser.id} id={browser.id} title={browser.source ? `SOURCE · ${browser.source}` : "MUSIC LIBRARY"} width={680}
@@ -106,7 +109,7 @@ function Shell() {
               {s}
             </button>
           ))}
-          <button className="wa-menu-item" onClick={() => setPos(DEFAULT)}>  reset windows</button>
+          <Button variant="retro" size="retro" className="wa-menu-item" onClick={arrange}>  reset windows</Button>
         </div>
       )}
     </div>
@@ -116,7 +119,7 @@ function Shell() {
 export function Desktop() {
   return (
     <PlayerProvider>
-      <Shell />
+      <WindowWorkspace><Shell /></WindowWorkspace>
     </PlayerProvider>
   );
 }
