@@ -454,7 +454,7 @@
 .wa-startup-lights span { background: var(--startup-metal); }
 .wa-neon-startup[data-running="true"] .wa-startup-logo { animation: wa-neon-power 6.2s ease-in-out forwards; }
 .wa-neon-startup[data-running="true"] .wa-neon-sign { animation: wa-sign-power 6.2s ease-in-out forwards; }
-.wa-neon-startup[data-running="true"] .wa-startup-lights span { animation: wa-light-power .4s ease-out forwards; }
+.wa-neon-startup[data-running="true"] .wa-startup-lights span { animation-name: wa-light-power; animation-duration: .4s; animation-timing-function: ease-out; animation-fill-mode: forwards; }
 .wa-startup-lights span:nth-child(1) { animation-delay: .2s; }
 .wa-startup-lights span:nth-child(2) { animation-delay: .45s; }
 .wa-startup-lights span:nth-child(3) { animation-delay: .7s; }
