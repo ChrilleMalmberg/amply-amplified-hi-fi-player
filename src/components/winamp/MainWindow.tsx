@@ -62,7 +62,7 @@ function Spectrum() {
   return <canvas ref={ref} width={152} height={32} className="wa-spectrum" onClick={() => setScope((s) => !s)} title="Click: spectrum / oscilloscope" />;
 }
 
-export function MainWindow({ onTogglePL, onToggleVis }: { onTogglePL: () => void; onToggleVis: () => void }) {
+export function MainWindow({ onTogglePL, onToggleVis, onToggleEQ }: { onTogglePL: () => void; onToggleVis: () => void; onToggleEQ: () => void }) {
   const p = usePlayer();
   const fileRef = useRef<HTMLInputElement>(null);
   const t = p.tracks[p.current];
@@ -100,6 +100,7 @@ export function MainWindow({ onTogglePL, onToggleVis }: { onTogglePL: () => void
           <div className="wa-sliders">
             <input aria-label="Volume" className="wa-range" type="range" min={0} max={1} step={0.01} value={p.volume} onChange={(e) => p.setVolume(+e.target.value)} />
             <input aria-label="Balance" className="wa-range wa-balance" type="range" min={-1} max={1} step={0.02} value={p.balance} onChange={(e) => p.setBalance(+e.target.value)} onDoubleClick={() => p.setBalance(0)} />
+            <button className={`wa-toggle ${p.eq.on ? "wa-on" : ""}`} onClick={onToggleEQ}>EQ</button>
             <button className="wa-toggle" onClick={onToggleVis}>VIS</button>
             <button className="wa-toggle" onClick={onTogglePL}>PL</button>
           </div>

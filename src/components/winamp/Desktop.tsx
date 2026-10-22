@@ -4,6 +4,7 @@ import { WaWindow } from "./WaWindow";
 import { MainWindow } from "./MainWindow";
 import { PlaylistWindow } from "./PlaylistWindow";
 import { VisualizerWindow } from "./VisualizerWindow";
+import { EqualizerWindow } from "./EqualizerWindow";
 import { IntroSplash } from "./IntroSplash";
 
 const SKINS = ["classic", "nucleo", "ruby", "matrix"] as const;
