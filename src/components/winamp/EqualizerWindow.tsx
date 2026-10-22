@@ -11,7 +11,7 @@ function VSlider({ value, onChange, label }: { value: number; onChange: (v: numb
         type="range"
         min={-12}
         max={12}
-        step={0.5}
+        step={0.1}
         value={value}
         onChange={(e) => onChange(+e.target.value)}
         onDoubleClick={() => onChange(0)}
