@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { nextIndex, prevIndex, readTags } from "@/lib/winamp-logic";
+import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/playlist-store";
 
 export type Track = { id: number; file: File; url: string; title: string; duration: number };
 
@@ -129,6 +130,50 @@ function usePlayerState() {
     setTracks((ts) => [...ts, ...added]);
   }, []);
 
+  /** Replace the queue with stored items (keeps original file bytes). */
+  const loadItems = useCallback((items: StoredItem[]) => {
+    const el = audioRef.current;
+    if (el) {
+      el.pause();
+      el.removeAttribute("src");
+    }
+    setPlaying(false);
+    setPaused(false);
+    setTime(0);
+    setCurrent(-1);
+    setTracks((old) => {
+      old.forEach((t) => URL.revokeObjectURL(t.url));
+      return items.map((it) => ({
+        id: idRef.current++,
+        file: it.file,
+        url: URL.createObjectURL(it.file),
+        title: it.title,
+        duration: it.duration,
+      }));
+    });
+  }, []);
+
+  const toItems = useCallback(
+    (ts: Track[]): StoredItem[] => ts.map((t) => ({ file: t.file, title: t.title, duration: t.duration })),
+    [],
+  );
+
+  // Restore the last queue on first load, then keep it saved automatically.
+  const restored = useRef(false);
+  useEffect(() => {
+    loadPlaylist(QUEUE_KEY)
+      .then((p) => p && p.items.length && loadItems(p.items))
+      .catch(() => {})
+      .finally(() => (restored.current = true));
+  }, [loadItems]);
+  useEffect(() => {
+    if (!restored.current) return;
+    const h = setTimeout(() => {
+      void savePlaylist({ name: QUEUE_KEY, items: toItems(tracks), savedAt: Date.now() }).catch(() => {});
+    }, 800);
+    return () => clearTimeout(h);
+  }, [tracks, toItems]);
+
   const a = () => audioRef.current;
   const api = {
     tracks,
@@ -147,6 +192,8 @@ function usePlayerState() {
     ensureGraph,
     addFiles,
     playAt,
+    loadItems,
+    saveAs: (name: string) => savePlaylist({ name, items: toItems(tracks), savedAt: Date.now() }),
     duration: tracks[current]?.duration ?? 0,
     play: () => {
       const el = a();
