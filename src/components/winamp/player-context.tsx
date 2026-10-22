@@ -2,6 +2,7 @@ import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { nextIndex, prevIndex, readTags } from "@/lib/winamp-logic";
 import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/playlist-store";
+import { applyEqualizer, effectiveBalance, type AudioCapabilities } from "@/lib/audio-plugins";
 
 export type Track = { id: number; file: File; url: string; title: string; duration: number };
 
@@ -30,10 +31,7 @@ function loadEq(): EqState {
 }
 
 /** Push EQ state into the live audio graph. OFF flattens every band (true bypass sound, no clicks). */
-function applyEqToGraph(pre: GainNode, bands: BiquadFilterNode[], eq: EqState) {
-  pre.gain.value = eq.on ? Math.pow(10, eq.preamp / 20) : 1;
-  bands.forEach((bq, i) => (bq.gain.value = eq.on ? (eq.bands[i] ?? 0) : 0));
-}
+const applyEqToGraph = applyEqualizer;
 
 export const AUDIO_EXT = /\.(mp3|mp2|mpga|flac|wav|wave|bwf|ogg|oga|opus|spx|m4a|m4b|mp4|aac|adts|aif|aiff|aifc|webm|weba|caf|alac|mka|wma|ape|wv|mpc|tta|dsf|dff|ac3|eac3|dts|amr|3gp|3ga|au|snd|mid|midi)$/i;
 export const AUDIO_ACCEPT = "audio/*,.mp3,.mp2,.mpga,.flac,.wav,.bwf,.ogg,.oga,.opus,.spx,.m4a,.m4b,.mp4,.aac,.adts,.aif,.aiff,.aifc,.webm,.weba,.caf,.alac,.mka,.wma,.ape,.wv,.mpc,.tta,.dsf,.dff,.ac3,.eac3,.dts,.amr,.3gp,.3ga,.au,.snd,.mid,.midi";
@@ -65,6 +63,10 @@ function usePlayerState() {
   const [time, setTime] = useState(0);
   const [volume, setVolumeS] = useState(0.8);
   const [balance, setBalanceS] = useState(0);
+  const [balanceEnabled, setBalanceEnabledS] = useState(true);
+  const balanceState = useRef({ enabled: balanceEnabled, value: balance });
+  balanceState.current = { enabled: balanceEnabled, value: balance };
+  const [audioCapabilities, setAudioCapabilities] = useState<AudioCapabilities>({ equalizer: false, balance: false });
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [sampleRate, setSampleRate] = useState(44100);
@@ -80,6 +82,7 @@ function usePlayerState() {
       const ctx = new AudioContext({ latencyHint: "playback" });
       const src = ctx.createMediaElementSource(a);
       const pan = ctx.createStereoPanner();
+      pan.pan.value = effectiveBalance(balanceState.current.enabled, balanceState.current.value);
       const an = ctx.createAnalyser();
       an.fftSize = 2048;
       an.smoothingTimeConstant = 0.7;
@@ -234,6 +237,23 @@ function usePlayerState() {
 
   useEffect(() => { updateEq(loadEq()); }, [updateEq]);
 
+  const saveBalance = (enabled: boolean, value: number) => {
+    const normalized = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+    setBalanceS(normalized);
+    setBalanceEnabledS(enabled);
+    balanceState.current = { enabled, value: normalized };
+    if (pannerRef.current) pannerRef.current.pan.value = effectiveBalance(enabled, normalized);
+    try { localStorage.setItem("amply-balance", JSON.stringify({ enabled, value: normalized })); } catch { /* storage unavailable */ }
+  };
+  useEffect(() => {
+    const proto = typeof AudioContext !== "undefined" ? AudioContext.prototype : undefined;
+    setAudioCapabilities({ equalizer: typeof proto?.createBiquadFilter === "function", balance: typeof proto?.createStereoPanner === "function" });
+    try {
+      const saved = JSON.parse(localStorage.getItem("amply-balance") || "null");
+      if (saved && typeof saved.enabled === "boolean" && typeof saved.value === "number") saveBalance(saved.enabled, saved.value);
+    } catch { /* keep defaults */ }
+  }, []);
+
   const tracksFromItems = (items: StoredItem[]): Track[] => items.map(item => ({
     id: idRef.current++, file: item.file, url: URL.createObjectURL(item.file),
     title: item.artist && item.artist !== "Unknown artist" ? `${item.artist} - ${item.title}` : item.title,
@@ -263,6 +283,8 @@ function usePlayerState() {
     time,
     volume,
     balance,
+    balanceEnabled,
+    audioCapabilities,
     shuffle,
     repeat,
     sampleRate,
@@ -321,9 +343,9 @@ function usePlayerState() {
       if (el) el.volume = c;
     },
     setBalance: (b: number) => {
-      setBalanceS(b);
-      if (pannerRef.current) pannerRef.current.pan.value = b;
+      saveBalance(balanceEnabled, b);
     },
+    setBalanceEnabled: (enabled: boolean) => saveBalance(enabled, balance),
     toggleShuffle: () => setShuffle((s) => !s),
     toggleRepeat: () => setRepeat((s) => !s),
     eq,

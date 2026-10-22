@@ -1,4 +1,5 @@
 import { usePlayer, EQ_LABELS, EQ_PRESETS } from "./player-context";
+import { Button } from "@/components/ui/button";
 
 function VSlider({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
@@ -25,11 +26,11 @@ export function EqualizerWindow() {
   return (
     <div className="wa-eq">
       <div className="wa-eq-top">
-        <button className={`wa-toggle ${p.eq.on ? "wa-on" : ""}`} onClick={() => p.setEqOn(!p.eq.on)}>
+        <Button variant="retro" size="retro" aria-label="Equalizer on" aria-pressed={p.eq.on} className={`wa-toggle ${p.eq.on ? "wa-on" : ""}`} onClick={() => p.setEqOn(!p.eq.on)}>
           ON
-        </button>
+        </Button>
         <span className="wa-eq-scale">+12db</span>
-        <button
+        <Button variant="retro" size="retro"
           className="wa-toggle"
           onClick={() => {
             const names = Object.keys(EQ_PRESETS);
@@ -38,7 +39,7 @@ export function EqualizerWindow() {
           }}
         >
           PRESETS
-        </button>
+        </Button>
       </div>
       <div className="wa-eq-mid">
         <span className="wa-eq-scale">+0db</span>
