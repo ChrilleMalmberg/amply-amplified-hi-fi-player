@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { snap, type Rect } from "@/lib/winamp-logic";
 import { Button } from "@/components/ui/button";
 import { Link2, Unlink, MoveDiagonal2 } from "lucide-react";
-import { connectedWindows, resizeWindows, type WindowRect } from "@/lib/window-layout";
+import { bounds, connectedWindows, dragWindows, moveWindows, resizeWindows, type WindowRect } from "@/lib/window-layout";
 import { useWindowWorkspace } from "./WindowWorkspace";
 
 let nextWindowLayer = 1;
@@ -42,26 +42,29 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
     const el = ref.current;
     if (!el) return;
     e.preventDefault();
-    const initial = readWindows().find(w => w.id === id);
+    const windows = readWindows();
+    const initial = windows.find(w => w.id === id);
     if (!initial) return;
-    const ox = e.clientX - initial.x;
-    const oy = e.clientY - initial.y;
-    const others: Rect[] = Array.from(document.querySelectorAll<HTMLElement>("[data-wa-win]"))
-      .filter((n) => n.dataset["waWin"] !== id)
-      .map((n) => {
-        return { x: n.offsetLeft, y: n.offsetTop, w: n.offsetWidth, h: n.offsetHeight };
-      });
+    const group = dragWindows(id, windows, workspace?.detached);
+    const groupBounds = bounds(group);
+    const ox = e.clientX - groupBounds.x;
+    const oy = e.clientY - groupBounds.y;
+    const others: Rect[] = windows.filter(w => !group.some(member => member.id === w.id));
     const move = (ev: PointerEvent) => {
-      const next = snap({ x: Math.max(0, ev.clientX - ox), y: Math.max(0, ev.clientY - oy), w: initial.w, h: initial.h }, others, Math.max(window.innerWidth, initial.x + initial.w), Math.max(window.innerHeight, initial.y + initial.h));
-      workspace?.update([{ ...initial, ...next }]);
-      onMove(next);
+      const next = snap({ ...groupBounds, x: Math.max(0, ev.clientX - ox), y: Math.max(0, ev.clientY - oy) }, others, Math.max(window.innerWidth, groupBounds.x + groupBounds.w), Math.max(window.innerHeight, groupBounds.y + groupBounds.h));
+      const moved = moveWindows(group, next.x - groupBounds.x, next.y - groupBounds.y);
+      workspace?.update(moved);
+      const player = moved.find(w => w.id === id);
+      if (player) onMove({ x: player.x, y: player.y });
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
   };
 
   const onResize = (e: React.PointerEvent, axis: "both" | "x" | "y") => {

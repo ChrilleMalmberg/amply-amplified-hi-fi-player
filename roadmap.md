@@ -19,3 +19,6 @@
 - [x] Official uploaded logo with increasing neon startup lights
 - [x] Original cinematic startup sound, mute/skip controls and verified transition to player
 - [x] Fix clicks before startup is ready and verify visible loading/startup progress
+- [ ] Make dragging the main player move its snapped group, preserving individual separation and joined resizing
+- [ ] Verify group movement, detachment, and saved positions
+- [ ] Package and inspect the standalone AmPly v3.0 Windows installer
