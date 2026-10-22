@@ -50,9 +50,9 @@ export function RemotePlayerProvider({children}:{children:ReactNode}) {
   },[]);
   const send=(method:string,args:unknown[])=>channel.current?.postMessage({type:"action",method,args});
   const api={...snapshot,analyserRef:{current:null},...Object.fromEntries(METHODS.map(method=>[method,(...args:unknown[])=>send(method,args)])),
-    addFiles:(files:FileList|File[])=>send("addFiles",[Array.from(files)]),
+    addFiles:async (files:FileList|File[])=>{send("addFiles",[Array.from(files)]);},
     setTracks:(update:Track[]|((old:Track[])=>Track[]))=>{const tracks=latest.current.tracks??[];send("setTrackOrder",[(typeof update==="function"?update(tracks):update).map(t=>t.id)]);},
-    saveAs:(name:string)=>new Promise((resolve,reject)=>{const id=crypto.randomUUID();const timer=setTimeout(()=>{pending.current.delete(id);reject(new Error("Player unavailable"));},15000);pending.current.set(id,{resolve,reject,timer});channel.current?.postMessage({type:"action",method:"saveAs",args:[name],id});}),
+    saveAs:(name:string)=>new Promise<IDBValidKey>((resolve,reject)=>{const id=crypto.randomUUID();const timer=setTimeout(()=>{pending.current.delete(id);reject(new Error("Player unavailable"));},15000);pending.current.set(id,{resolve:value=>{if(typeof value==="string"||typeof value==="number")resolve(value);else resolve(name);},reject,timer});channel.current?.postMessage({type:"action",method:"saveAs",args:[name],id});}),
   } as PlayerApi;
   return <PlayerContext.Provider value={api}>{children}</PlayerContext.Provider>;
 }

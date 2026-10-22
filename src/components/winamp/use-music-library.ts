@@ -12,12 +12,15 @@ export function useMusicLibrary() {
   const busy = useRef(false);
   useEffect(() => {
     let active = true;
-    loadPlaylist(LIBRARY_KEY).then(list => {
+    const refresh = () => loadPlaylist(LIBRARY_KEY).then(list => {
       if (!active) return;
       itemsRef.current = list?.items || [];
       setItems(itemsRef.current);
     }).catch(() => active && setError("Music storage unavailable")).finally(() => active && setReady(true));
-    return () => { active = false; };
+    void refresh();
+    const channel = new BroadcastChannel("amply-library-v1");
+    channel.onmessage = () => { void refresh(); };
+    return () => { active = false; channel.close(); };
   }, []);
 
   const importFiles = async (files: File[]) => {
@@ -38,6 +41,8 @@ export function useMusicLibrary() {
       await savePlaylist({ name: LIBRARY_KEY, items: next, savedAt: Date.now() });
       itemsRef.current = next;
       setItems(next);
+      const channel = new BroadcastChannel("amply-library-v1");
+      channel.postMessage("changed"); channel.close();
       if (!audio.length) setError("No audio files found");
     } catch {
       setError("Import could not be saved. Check available disk space and try again.");
