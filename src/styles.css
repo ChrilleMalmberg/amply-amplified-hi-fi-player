@@ -148,16 +148,17 @@
 /* ===== Winamp 2.0 skin system ===== */
 .wa-desktop {
   --wa-desk: oklch(0.5 0.09 195);
-  --wa-face: oklch(0.3 0.03 275);
-  --wa-hi: oklch(0.52 0.03 275);
-  --wa-lo: oklch(0.15 0.02 275);
-  --wa-lcd: oklch(0.1 0 0);
-  --wa-lcd-text: oklch(0.8 0.25 142);
+  --wa-face: oklch(0.74 0.015 260);
+  --wa-hi: oklch(0.93 0.01 260);
+  --wa-lo: oklch(0.36 0.02 260);
+  --wa-lcd: oklch(0.12 0.01 145);
+  --wa-lcd-text: oklch(0.82 0.26 142);
   --wa-spec-hi: oklch(0.75 0.2 60);
-  --wa-title: oklch(0.85 0.12 90);
-  --wa-title-bg: oklch(0.25 0.04 270);
+  --wa-title: oklch(0.97 0 0);
+  --wa-title-bg: linear-gradient(to right, oklch(0.3 0.03 265), oklch(0.62 0.06 250));
   --wa-sel: oklch(0.38 0.17 265);
   --wa-cur: oklch(0.97 0 0);
+  --wa-btn-text: oklch(0.42 0.13 150);
   position: fixed; inset: 0; overflow: hidden;
   background: var(--wa-desk);
   font-family: "VT323", monospace;
@@ -196,10 +197,10 @@
 .wa-range::-webkit-slider-thumb { appearance: none; width: 20px; height: 14px; background: var(--wa-hi); border: 1px solid; border-color: var(--wa-title) var(--wa-lo) var(--wa-lo) var(--wa-title); }
 .wa-range::-moz-range-thumb { width: 20px; height: 14px; background: var(--wa-hi); border-radius: 0; }
 .wa-controls { display: flex; gap: 2px; align-items: center; }
-.wa-btn { width: 46px; height: 36px; font-size: 18px; color: var(--wa-cur); background: linear-gradient(var(--wa-hi), var(--wa-face)); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+.wa-btn { width: 46px; height: 36px; font-size: 18px; color: var(--wa-btn-text); text-shadow: 0 1px 0 var(--wa-hi); background: linear-gradient(to bottom, var(--wa-hi), var(--wa-face) 60%, var(--wa-lo)); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 .wa-btn:active, .wa-toggle:active { border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
 .wa-eject { margin-left: 8px; width: 40px; }
-.wa-toggle { font-family: "Silkscreen", monospace; font-size: 10px; padding: 3px 6px; color: var(--wa-hi); background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
+.wa-toggle { font-family: "Silkscreen", monospace; font-size: 10px; padding: 3px 6px; color: var(--wa-btn-text); background: linear-gradient(to bottom, var(--wa-hi), var(--wa-face)); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 .wa-spacer { flex: 1; }
 .wa-logo { font-size: 20px; color: var(--wa-title); }
 .wa-blink { animation: wa-blink 1s steps(1) infinite; }
