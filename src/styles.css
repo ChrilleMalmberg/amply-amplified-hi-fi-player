@@ -292,3 +292,4 @@
 .wa-slwrap .wa-range { flex: none; width: 100%; }
 .wa-slwrap.wa-balance .wa-range { background: linear-gradient(to right, var(--wa-lcd-text), var(--wa-lo), var(--wa-lcd-text)); }
 .wa-slval { font-size: 15px; line-height: 14px; text-align: center; color: var(--wa-lcd-text); text-shadow: 0 0 4px var(--wa-lcd-text); }
+@media (max-width: 700px) { .wa-hint { display: none; } }
