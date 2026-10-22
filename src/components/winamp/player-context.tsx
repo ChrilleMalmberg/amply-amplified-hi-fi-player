@@ -28,6 +28,12 @@ function loadEq(): EqState {
   return EQ_DEFAULT;
 }
 
+/** Push EQ state into the live audio graph. OFF flattens every band (true bypass sound, no clicks). */
+function applyEqToGraph(pre: GainNode, bands: BiquadFilterNode[], eq: EqState) {
+  pre.gain.value = eq.on ? Math.pow(10, eq.preamp / 20) : 1;
+  bands.forEach((bq, i) => (bq.gain.value = eq.on ? eq.bands[i] : 0));
+}
+
 export const AUDIO_EXT = /\.(mp3|flac|wav|wave|ogg|oga|opus|m4a|mp4|aac|aif|aiff|webm|weba|caf|alac|mka)$/i;
 export const AUDIO_ACCEPT = "audio/*,.mp3,.flac,.wav,.ogg,.oga,.opus,.m4a,.aac,.aif,.aiff,.webm,.weba,.caf,.mka";
 
@@ -213,6 +219,14 @@ function usePlayerState() {
     }, 800);
     return () => clearTimeout(h);
   }, [tracks, toItems]);
+
+  const updateEq = useCallback((next: EqState) => {
+    setEq(next);
+    try {
+      localStorage.setItem(EQ_KEY, JSON.stringify(next));
+    } catch { /* ignore */ }
+    if (eqPreampRef.current) applyEqToGraph(eqPreampRef.current, eqBandsRef.current, next);
+  }, []);
 
   const a = () => audioRef.current;
   const api = {
