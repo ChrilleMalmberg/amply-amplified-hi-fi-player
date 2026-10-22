@@ -2,7 +2,6 @@ import { AmplyLogo } from "./AmplyLogo";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer, AUDIO_ACCEPT } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
-import bolt from "@/assets/bolt-icon.svg";
 
 function cssVar(el: Element, n: string) {
   return getComputedStyle(el).getPropertyValue(n).trim();
