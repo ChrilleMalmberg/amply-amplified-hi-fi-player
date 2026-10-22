@@ -11,6 +11,10 @@ import { PluginWindow } from "./PluginWindow";
 import { WindowWorkspace, useWindowWorkspace } from "./WindowWorkspace";
 import { Button } from "@/components/ui/button";
 import { Library, Minimize2, Maximize2, Columns2, Plug } from "lucide-react";
+import { useHydrated } from "@tanstack/react-router";
+import { desktopBridge, useNativePanel } from "@/lib/desktop-bridge";
+import { NativeDesktop } from "./NativeDesktop";
+import { RemotePlayerProvider } from "./RemotePlayer";
 
 const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
@@ -117,6 +121,14 @@ function Shell() {
 }
 
 export function Desktop() {
+  const hydrated = useHydrated();
+  const panel = useNativePanel();
+  if (hydrated && desktopBridge()) {
+    if (!panel) return <div className="wa-desktop" data-skin="silver"><div className="wa-intro" role="status">Loading AmPly…</div></div>;
+    return panel.kind === "main"
+      ? <PlayerProvider><NativeDesktop panel={panel}/></PlayerProvider>
+      : <RemotePlayerProvider><NativeDesktop panel={panel}/></RemotePlayerProvider>;
+  }
   return (
     <PlayerProvider>
       <WindowWorkspace><Shell /></WindowWorkspace>

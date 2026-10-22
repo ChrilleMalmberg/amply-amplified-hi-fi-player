@@ -12,7 +12,7 @@ try {
   await mkdir(path.join(stage, "electron"));
   await mkdir(path.join(stage, "dist-electron"));
   await cp(path.join(root, "dist-electron/client"), path.join(stage, "dist-electron/client"), { recursive: true });
-  for (const file of ["main.cjs", "icon.ico"]) {
+  for (const file of ["main.cjs", "preload.cjs", "window-layout.cjs", "icon.ico"]) {
     await cp(path.join(root, "electron", file), path.join(stage, "electron", file));
   }
   const pointerPath = path.join(root, "src/assets/amply-official-startup.jpg.asset.json");
