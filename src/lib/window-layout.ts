@@ -30,6 +30,19 @@ export function bounds(windows: Rect[]): Rect {
   return { x, y, w: Math.max(...windows.map(w => w.x + w.w)) - x, h: Math.max(...windows.map(w => w.y + w.h)) - y };
 }
 
+/** The player leads its docked group; other title bars move only their own window. */
+export function dragWindows(id: string, windows: WindowRect[], detached: string[] = []) {
+  return id === "main" ? connectedWindows(id, windows, detached) : windows.filter(w => w.id === id);
+}
+
+/** Translate without changing shared edges, keeping the whole group on the top/left of the workspace. */
+export function moveWindows(windows: WindowRect[], dx: number, dy: number): WindowRect[] {
+  const group = bounds(windows);
+  const x = Math.max(-group.x, dx);
+  const y = Math.max(-group.y, dy);
+  return windows.map(w => ({ ...w, x: w.x + x, y: w.y + y }));
+}
+
 /** Scale a docked group on both axes, preserving shared edges and each window's minimum size. */
 export function resizeWindows(windows: WindowRect[], dx: number, dy: number): WindowRect[] {
   const group = bounds(windows);
