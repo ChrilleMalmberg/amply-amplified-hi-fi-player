@@ -18,4 +18,4 @@
 - [x] Verify three-window resizing, separation, saved layout and live EQ
 - [x] Official uploaded logo with increasing neon startup lights
 - [x] Original cinematic startup sound, mute/skip controls and verified transition to player
-- [ ] Fix clicks before startup is ready and verify visible loading/startup progress
+- [x] Fix clicks before startup is ready and verify visible loading/startup progress
