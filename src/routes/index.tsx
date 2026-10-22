@@ -4,10 +4,10 @@ import { Desktop } from "@/components/winamp/Desktop";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Llamamp — classic Winamp 2.0 style music player" },
-      { name: "description", content: "Play your own music in a faithful Winamp 2.0 style player with playlist, spectrum and Milkdrop visuals." },
-      { property: "og:title", content: "Llamamp — classic Winamp 2.0 style player" },
-      { property: "og:description", content: "It really whips the llama's ass. Drop your music files and play." },
+      { title: "HiFi Ampli Player V-2.1 — audiophile music player" },
+      { name: "description", content: "Play your own lossless music with a 10-band equalizer in a classic retro player." },
+      { property: "og:title", content: "HiFi Ampli Player V-2.1" },
+      { property: "og:description", content: "Audiophile playback of your own music files with a classic look." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -35,7 +35,8 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
   return (
     <button className="wa-intro" onClick={start}>
       <img src={llama} alt="Pixel llama" width={816} height={816} className="wa-intro-llama" />
-      <span className="wa-intro-title">WINAMP</span>
+      <span className="wa-intro-title">AMPLI PLAYER</span>
+      <span className="wa-intro-sub">HiFi · V-2.1</span>
       <span className="wa-intro-sub">It really whips the llama's ass!</span>
       <span className="wa-intro-click wa-blink">Click to start</span>
     </button>

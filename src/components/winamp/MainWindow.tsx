@@ -67,7 +67,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
   const fileRef = useRef<HTMLInputElement>(null);
   const t = p.tracks[p.current];
   const kbps = t && t.duration ? Math.round((t.file.size * 8) / t.duration / 1000) : 0;
-  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "WINAMP 2.0  ***  IT REALLY WHIPS THE LLAMA'S ASS  ***  ";
+  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "HIFI AMPLI PLAYER V-2.1  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
   const [remaining, setRemaining] = useState(false);
   const shown = remaining ? p.duration - p.time : p.time;
 

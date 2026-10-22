@@ -8,7 +8,7 @@ import { IntroSplash } from "./IntroSplash";
 
 const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
-const DEFAULT = { main: { x: 40, y: 40 }, pl: { x: 40, y: 276 }, vis: { x: 600, y: 40 }, eq: { x: 40, y: 580 } };
+const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 236 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 560 } };
 
 function Shell() {
   const p = usePlayer();
@@ -21,15 +21,15 @@ function Shell() {
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem("wa-state") || "null");
-      if (s?.pos) setPos(s.pos);
-      if (s?.skin && s.v === 3) setSkin(s.skin);
+      if (s?.pos && s.v === 4) setPos(s.pos);
+      if (s?.skin && s.v >= 3) setSkin(s.skin);
       if (s?.show) setShow(s.show);
     } catch {
       /* ignore */
     }
   }, []);
   useEffect(() => {
-    localStorage.setItem("wa-state", JSON.stringify({ v: 3, pos, skin, show }));
+    localStorage.setItem("wa-state", JSON.stringify({ v: 4, pos, skin, show }));
   }, [pos, skin, show]);
 
   useEffect(() => {
@@ -55,17 +55,17 @@ function Shell() {
   return (
     <div className="wa-desktop" data-skin={skin} onClick={() => setMenu(null)}>
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
-      <WaWindow id="main" title="WINAMP" pos={pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
+      <WaWindow id="main" title="HIFI AMPLI PLAYER" pos={pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {show.pl && (
-        <WaWindow id="pl" title="WINAMP PLAYLIST" pos={pos["pl"] ?? DEFAULT.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
+        <WaWindow id="pl" title="PLAYLIST" pos={pos["pl"] ?? DEFAULT.pl} onMove={mv("pl")} width={550} onClose={() => setShow((s) => ({ ...s, pl: false }))}>
           <PlaylistWindow />
         </WaWindow>
       )}
       {show.eq && (
-        <WaWindow id="eq" title="WINAMP EQUALIZER" pos={pos["eq"] ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
+        <WaWindow id="eq" title="EQUALIZER" pos={pos["eq"] ?? DEFAULT.eq} onMove={mv("eq")} width={550} onClose={() => setShow((s) => ({ ...s, eq: false }))}>
           <EqualizerWindow />
         </WaWindow>
       )}
