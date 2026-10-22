@@ -15,8 +15,8 @@ import { useHydrated } from "@tanstack/react-router";
 import { desktopBridge, useNativePanel } from "@/lib/desktop-bridge";
 import { NativeDesktop } from "./NativeDesktop";
 import { RemotePlayerProvider } from "./RemotePlayer";
+import { PLAYER_SKINS } from "@/lib/player-skins";
 
-const SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
 type Pos = { x: number; y: number };
 const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 528 }, plugins: { x: 32, y: 80 } };
 
@@ -107,7 +107,7 @@ function Shell() {
       {menu && (
         <div className="wa-menu" style={{ left: menu.x, top: menu.y }}>
           <div className="wa-menu-head">Skins</div>
-          {SKINS.map((s) => (
+          {PLAYER_SKINS.map((s) => (
             <button key={s} className={`wa-menu-item ${skin === s ? "wa-on" : ""}`} onClick={() => setSkin(s)}>
               {skin === s ? "✓ " : "  "}
               {s}

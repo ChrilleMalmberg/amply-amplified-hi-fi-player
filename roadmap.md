@@ -25,4 +25,5 @@
 - [x] Replace the outer desktop frame with independent real windows across monitors
 - [x] Verify shared playback, native docking, resizing, saved positions, and negative-coordinate monitor recovery tests in a real Linux Electron session
 - [x] Deliver the revised v3.0 Windows installer
-- [ ] Confirm installation and physical multi-monitor behavior on Windows; requires testing on the user's Windows machine
+- [x] Confirm Windows installation launches independent windows (user confirmation); physical multi-monitor behavior remains untested
+- [x] Restore the native right-click skin menu, verify synchronized saved skins in real Electron windows, and deliver an updated installer

@@ -11,6 +11,7 @@ import { IntroSplash } from "./IntroSplash";
 import { useMusicLibrary } from "./use-music-library";
 import { PlayerBroadcaster } from "./RemotePlayer";
 import { usePlayer } from "./player-context";
+import { PLAYER_SKINS, savePlayerSkin } from "@/lib/player-skins";
 
 function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:string;children:ReactNode;controls?:ReactNode}) {
   const [state,setState]=useState<NativeWindowState>({detached:false,grouped:false});
@@ -18,6 +19,7 @@ function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:st
   const bridge=desktopBridge();
   useEffect(()=>bridge?.onWindowState(setState),[bridge]);
   const gesture=(event:React.PointerEvent,action:"move"|"resize",axis:"both"|"x"|"y"="both")=>{
+    if(event.button!==0)return;
     if(action==="move" && (event.target as HTMLElement).closest("button"))return;
     event.preventDefault();bridge?.gesture(action,axis);
   };
@@ -43,7 +45,15 @@ function NativeLibrary({panel}:{panel:NativePanel}) {
 export function NativeDesktop({panel}:{panel:NativePanel}) {
   const p=usePlayer(); const [intro,setIntro]=useState(panel.kind==="main");
   const [skin,setSkin]=useState("silver");const [mode,setMode]=useState("large");
+  const [menu,setMenu]=useState<{x:number;y:number}|null>(null);
   const bridge=desktopBridge();
+  useEffect(()=>{
+    if(!menu)return;
+    const close=()=>setMenu(null);
+    const key=(event:KeyboardEvent)=>{if(event.key==="Escape")close();};
+    window.addEventListener("blur",close);window.addEventListener("resize",close);window.addEventListener("keydown",key);
+    return()=>{window.removeEventListener("blur",close);window.removeEventListener("resize",close);window.removeEventListener("keydown",key);};
+  },[menu]);
   useEffect(()=>{
     const read=()=>{try{setSkin(JSON.parse(localStorage.getItem("wa-state")||"null")?.skin||"silver");}catch{/* default */}};
     read();window.addEventListener("storage",read);return()=>window.removeEventListener("storage",read);
@@ -60,10 +70,22 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
     <Button variant="retro" size="retro" className="wa-tbtn" title="Full player" aria-label="Full player" onClick={()=>{setMode("large");bridge?.control("full");}}><Maximize2/></Button>
     <Button variant="retro" size="retro" className="wa-tbtn" title="Arrange windows" aria-label="Arrange windows" onClick={()=>bridge?.control("arrange")}><Columns2/></Button>
   </>:undefined;
-  return <div className="wa-desktop wa-native-desktop" data-skin={skin} data-mode={mode}>
+  return <div className="wa-desktop wa-native-desktop" data-skin={skin} data-mode={mode}
+    onClick={()=>setMenu(null)} onContextMenu={event=>{
+      if(intro || (event.target as HTMLElement).closest("input,textarea,select"))return;
+      event.preventDefault();bridge?.gesture("end");
+      setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-164)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-198))});
+    }}>
     {panel.kind==="main" && <PlayerBroadcaster/>}
     {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={controls}>
       {panel.kind==="main"?<MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
     </NativeFrame>}
+    {menu && <div className="wa-menu wa-native-skin-menu" role="menu" aria-label="Skins" style={{left:menu.x,top:menu.y}} onPointerDown={event=>event.stopPropagation()}>
+      <div className="wa-menu-head">Skins</div>
+      {PLAYER_SKINS.map(candidate=><Button key={candidate} variant="retro" size="retro" role="menuitemradio" aria-checked={skin===candidate} className="wa-menu-item" onClick={()=>{
+        savePlayerSkin(candidate,localStorage);setSkin(candidate);setMenu(null);
+      }}>{skin===candidate?"✓ ":"  "}{candidate}</Button>)}
+      <Button variant="retro" size="retro" role="menuitem" className="wa-menu-item" onClick={()=>bridge?.control("arrange")}>Reset windows</Button>
+    </div>}
   </div>;
 }
