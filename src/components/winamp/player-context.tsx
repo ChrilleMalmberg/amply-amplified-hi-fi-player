@@ -299,6 +299,14 @@ function usePlayerState() {
     },
     toggleShuffle: () => setShuffle((s) => !s),
     toggleRepeat: () => setRepeat((s) => !s),
+    eq,
+    setEqOn: (on: boolean) => updateEq({ ...eq, on }),
+    setEqBand: (i: number, v: number) => updateEq({ ...eq, bands: eq.bands.map((b, k) => (k === i ? v : b)) }),
+    setEqPreamp: (v: number) => updateEq({ ...eq, preamp: v }),
+    applyEqPreset: (name: string) => {
+      const pr = EQ_PRESETS[name];
+      if (pr) updateEq({ on: true, preamp: pr.preamp, bands: [...pr.bands] });
+    },
   };
   return api;
 }
