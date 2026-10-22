@@ -22,3 +22,6 @@
 - [x] Make dragging the main player move its snapped group, preserving individual separation and joined resizing
 - [x] Verify group movement, detachment, and saved positions
 - [x] Package and inspect the standalone AmPly v3.0 Windows installer
+- [ ] Replace the outer desktop frame with independent real windows across monitors
+- [ ] Verify shared playback, native docking, resizing, and saved multi-monitor positions
+- [ ] Deliver the revised v3.0 Windows installer
