@@ -1,4 +1,4 @@
-export const PLAYER_SKINS = ["silver", "classic", "nucleo", "ruby", "matrix"] as const;
+export const PLAYER_SKINS = ["silver", "classic", "nucleo", "ruby", "matrix", "modern"] as const;
 
 export function savePlayerSkin(skin: string, storage: Pick<Storage, "getItem" | "setItem">) {
   if (!PLAYER_SKINS.some(candidate => candidate === skin)) return;

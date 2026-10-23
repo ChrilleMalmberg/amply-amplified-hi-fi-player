@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Library, Plug, Minimize2, Maximize2, Columns2, Link2, Unlink, MoveDiagonal2, X, Minus } from "lucide-react";
+import { Library, Plug, Minimize2, Maximize2, Columns2, Link2, Unlink, MoveDiagonal2, X, Minus, Square, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { desktopBridge, type NativePanel, type NativeWindowState } from "@/lib/desktop-bridge";
 import { MainWindow } from "./MainWindow";
@@ -26,10 +26,11 @@ function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:st
   const shade=()=>{setShaded(v=>!v);bridge?.control("shade");};
   return <div className="wa-window wa-native-window" data-wa-win={panel.id} data-grouped={state.grouped} data-shaded={shaded}>
     <div className="wa-titlebar" onPointerDown={e=>gesture(e,"move")} onDoubleClick={shade}>
-      <span className="wa-title-stripes"/><span className="wa-title-text">{title}</span><span className="wa-title-stripes"/>{controls}
+      <span className="wa-title-text">{title}</span><span className="wa-title-stripes"/>{controls}
       <Button variant="retro" size="retro" className="wa-tbtn" title={state.detached?"Join snapped windows":"Detach window"} aria-label={`${state.detached?"Join":"Detach"} ${title}`} aria-pressed={!state.detached} onClick={()=>bridge?.control("detach",!state.detached)}>{state.detached?<Unlink/>:<Link2/>}</Button>
-      <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={shade}><Minus/></Button>
-      {panel.kind==="main" && <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Minimize AmPly" title="Minimize app" onClick={()=>bridge?.control("minimize")}><Minimize2/></Button>}
+      <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={shade}><ChevronUp/></Button>
+      {panel.kind==="main" && <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Minimize AmPly" title="Minimize app" onClick={()=>bridge?.control("minimize")}><Minus/></Button>}
+      <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Maximize ${title}`} title={panel.kind==="main"?"Maximize player and snapped windows":"Maximize window"} onClick={()=>bridge?.control("maximize")}><Square/></Button>
       <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Close ${title}`} title={panel.kind==="main"?"Exit AmPly":"Close window"} onClick={()=>bridge?.control("close")}><X/></Button>
     </div>
     {!shaded && <><div className="wa-window-content">{children}</div>
