@@ -1,6 +1,6 @@
 # AmPly website
 
-Plain static HTML/CSS — no build step, no server code. The Download and GitHub buttons in `index.html` point at `github.com/amply/Hi-Fi`.
+Plain static HTML/CSS — no build step, no server code. The Download and GitHub buttons in `index.html` point at `github.com/ChrilleMalmberg/amply-amplified-hi-fi-player`.
 
 ## Free hosting on Cloudflare Pages
 1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick this repository.
