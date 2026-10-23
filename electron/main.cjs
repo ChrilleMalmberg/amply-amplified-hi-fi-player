@@ -155,7 +155,9 @@ ipcMain.on("amply:control",(event,m)=>{
     if(!group.length)return;
     if(p.maximized&&p.restoreRects){const keep=p.restoreRects;p.maximized=false;p.restoreRects=null;apply(keep);}
     else{
-      const area=screen.getDisplayMatching(p.win.getBounds()).workArea;
+      let area=screen.getDisplayMatching(p.win.getBounds()).workArea;
+      if(!area||area.width<100||area.height<100)area=screen.getPrimaryDisplay().workArea;
+      if(!area||area.width<100||area.height<100){const d=screen.getPrimaryDisplay().size;area={x:0,y:0,width:d.width,height:d.height};}
       const x=Math.min(...group.map(r=>r.x)),y=Math.min(...group.map(r=>r.y));
       const w=Math.max(...group.map(r=>r.x+r.w))-x,h=Math.max(...group.map(r=>r.y+r.h))-y;
       p.restoreRects=group;p.maximized=true;
