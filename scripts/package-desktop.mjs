@@ -6,6 +6,7 @@ import { packager } from "@electron/packager";
 
 // Only runtime files enter the Windows application, never the working checkout.
 const root = process.cwd();
+const platform = process.argv[2] || "win32";
 const config = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const stage = await mkdtemp(path.join(tmpdir(), "amply-desktop-"));
 try {
@@ -24,13 +25,13 @@ try {
     name: "amply-hifi-player", version: config.version, main: "electron/main.cjs", description: "AmPly HiFi Player", author: "AmPly",
   }, null, 2));
   const paths = await packager({
-    dir: stage, name: "Ampli Player", platform: "win32", arch: "x64",
+    dir: stage, name: "Ampli Player", platform, arch: "x64",
     electronVersion: config.devDependencies.electron.replace(/^[^\d]+/, ""),
     appVersion: config.version, icon: path.join(stage, "electron/icon.ico"),
     out: path.join(tmpdir(), "amply-v3.0-release"), overwrite: true, prune: false,
     win32metadata: { ProductName: "AmPly HiFi Player", FileDescription: "AmPly HiFi Player V-3.0" },
   });
-  console.log("Windows application packaged:", paths.join(", "));
+  console.log(platform + " application packaged:", paths.join(", "));
 } finally {
   await rm(stage, { recursive: true, force: true });
 }
