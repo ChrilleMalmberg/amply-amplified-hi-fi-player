@@ -12,4 +12,9 @@ describe("Saved native skins",()=>{
     savePlayerSkin("unknown",{getItem:()=>value,setItem:(_key,next)=>{value=next;}});
     expect(JSON.parse(value).skin).toBe("silver");
   });
+  it("accepts the modern skin from the shared catalog",()=>{
+    let value='{"v":4,"skin":"silver"}';
+    savePlayerSkin("modern",{getItem:()=>value,setItem:(_key,next)=>{value=next;}});
+    expect(JSON.parse(value).skin).toBe("modern");
+  });
 });

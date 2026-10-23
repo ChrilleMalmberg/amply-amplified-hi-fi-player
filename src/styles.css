@@ -237,7 +237,16 @@
 .wa-window { position: absolute; background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); box-shadow: 0 0 0 1px var(--wa-lo); color: var(--wa-lcd-text); }
 .wa-titlebar { display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 4px; background: var(--wa-title-bg); cursor: grab; touch-action: none; }
 .wa-title-stripes { flex: 1; height: 10px; background: repeating-linear-gradient(to bottom, var(--wa-title) 0 1px, transparent 1px 3px); opacity: .7; }
+.wa-titlebar .wa-title-stripes:first-child { flex: 0 0 12px; }
 .wa-title-text { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--wa-title); letter-spacing: 2px; }
+
+/* Standard menu bar (File / Playlist / View / Settings) */
+.wa-menubar { position: relative; display: flex; gap: 2px; align-items: center; background: var(--wa-face); border-bottom: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); padding: 1px 2px; z-index: 30; }
+.wa-menubar-entry { position: relative; }
+.wa-menubar-btn { font-family: "Silkscreen", monospace; font-size: 11px; letter-spacing: 1px; padding: 2px 8px; color: var(--wa-btn-text); background: transparent; border: 1px solid transparent; }
+.wa-menubar-btn:hover, .wa-menubar-btn.wa-open { background: var(--wa-sel); color: var(--wa-cur); }
+.wa-menubar-menu { position: absolute; top: 100%; left: 0; z-index: 60; }
+.wa-menubar-lists { position: absolute; top: 100%; left: 0; right: 0; z-index: 55; background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); padding: 4px; }
 .wa-tbtn { width: 16px; height: 16px; line-height: 12px; font-size: 14px; background: var(--wa-face); color: var(--wa-title); border: 1px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 
 .wa-main { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
