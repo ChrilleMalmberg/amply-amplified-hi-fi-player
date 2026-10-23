@@ -164,9 +164,39 @@
   font-family: "VT323", monospace;
   user-select: none;
 }
-.wa-desktop[data-skin="nucleo"] { --wa-face: oklch(0.32 0.08 245); --wa-hi: oklch(0.55 0.1 240); --wa-lo: oklch(0.16 0.05 250); --wa-lcd-text: oklch(0.82 0.14 210); --wa-title: oklch(0.9 0.08 210); --wa-desk: oklch(0.25 0.05 250); }
-.wa-desktop[data-skin="ruby"] { --wa-face: oklch(0.32 0.1 20); --wa-hi: oklch(0.55 0.13 20); --wa-lo: oklch(0.15 0.05 20); --wa-lcd-text: oklch(0.75 0.2 30); --wa-spec-hi: oklch(0.9 0.15 90); --wa-title: oklch(0.88 0.1 60); --wa-desk: oklch(0.22 0.04 20); }
-.wa-desktop[data-skin="matrix"] { --wa-face: oklch(0.14 0.02 145); --wa-hi: oklch(0.35 0.08 145); --wa-lo: oklch(0.05 0 0); --wa-lcd-text: oklch(0.85 0.28 145); --wa-spec-hi: oklch(0.95 0.15 145); --wa-title: oklch(0.85 0.28 145); --wa-desk: oklch(0.08 0.01 145); }
+.wa-desktop[data-skin="nucleo"] { --wa-face: oklch(0.32 0.08 245); --wa-hi: oklch(0.55 0.1 240); --wa-lo: oklch(0.16 0.05 250); --wa-lcd-text: oklch(0.82 0.14 210); --wa-title: oklch(0.9 0.08 210); --wa-desk: oklch(0.25 0.05 250); --wa-btn-text: oklch(0.93 0.1 210); }
+.wa-desktop[data-skin="ruby"] { --wa-face: oklch(0.32 0.1 20); --wa-hi: oklch(0.55 0.13 20); --wa-lo: oklch(0.15 0.05 20); --wa-lcd-text: oklch(0.75 0.2 30); --wa-spec-hi: oklch(0.9 0.15 90); --wa-title: oklch(0.88 0.1 60); --wa-desk: oklch(0.22 0.04 20); --wa-btn-text: oklch(0.93 0.1 60); }
+.wa-desktop[data-skin="matrix"] { --wa-face: oklch(0.14 0.02 145); --wa-hi: oklch(0.35 0.08 145); --wa-lo: oklch(0.05 0 0); --wa-lcd-text: oklch(0.85 0.28 145); --wa-spec-hi: oklch(0.95 0.15 145); --wa-title: oklch(0.85 0.28 145); --wa-desk: oklch(0.08 0.01 145); --wa-btn-text: oklch(0.92 0.28 145); }
+
+/* Modern: flat dark theme inspired by MusicBee */
+.wa-desktop[data-skin="modern"] {
+  --wa-desk: oklch(0.24 0.012 260);
+  --wa-face: oklch(0.3 0.012 260);
+  --wa-hi: oklch(0.42 0.012 260);
+  --wa-lo: oklch(0.17 0.01 260);
+  --wa-lcd: oklch(0.2 0.012 260);
+  --wa-lcd-text: oklch(0.93 0.01 260);
+  --wa-spec-hi: oklch(0.75 0.14 230);
+  --wa-title: oklch(0.93 0.01 260);
+  --wa-title-bg: linear-gradient(to bottom, oklch(0.32 0.012 260), oklch(0.26 0.012 260));
+  --wa-btn-text: oklch(0.93 0.01 260);
+  --wa-sel: oklch(0.48 0.09 240);
+  --wa-cur: oklch(0.85 0.16 85);
+  --wa-orange: oklch(0.74 0.19 55);
+}
+.wa-desktop[data-skin="modern"] .wa-window { border: 1px solid var(--wa-lo); box-shadow: 0 4px 18px oklch(0 0 0 / 0.55); }
+.wa-desktop[data-skin="modern"] .wa-btn,
+.wa-desktop[data-skin="modern"] .wa-toggle,
+.wa-desktop[data-skin="modern"] .wa-tbtn { background: var(--wa-face); border: 1px solid var(--wa-lo); text-shadow: none; }
+.wa-desktop[data-skin="modern"] .wa-btn:hover,
+.wa-desktop[data-skin="modern"] .wa-toggle:hover,
+.wa-desktop[data-skin="modern"] .wa-tbtn:hover { background: var(--wa-hi); }
+.wa-desktop[data-skin="modern"] .wa-lcd { border: 1px solid var(--wa-lo); }
+.wa-desktop[data-skin="modern"] .wa-titlebar { height: 26px; }
+.wa-desktop[data-skin="modern"] .wa-title-stripes { display: none; }
+.wa-desktop[data-skin="modern"] .wa-title-text { font-weight: bold; letter-spacing: 1px; }
+.wa-desktop[data-skin="modern"] .wa-title-text,
+.wa-desktop[data-skin="modern"] .wa-tbtn { color: var(--wa-title); }
 
 /* Silver Matrix (default): silver frame, titles & buttons; black-green panels with green text */
 .wa-desktop[data-skin="silver"] {
