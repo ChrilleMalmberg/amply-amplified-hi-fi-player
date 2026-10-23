@@ -107,6 +107,11 @@ function makeWindow(id,kind,source="",startup=false) {
   win.on("closed",()=>windows.delete(id));
   win.on("minimize",()=>{if(kind==="main") for(const other of windows.values())if(other.id!==id&&other.win.isVisible())other.win.minimize();});
   win.on("restore",()=>{if(kind==="main") for(const other of windows.values())if(other.win.isMinimized())other.win.restore();});
+  // Clicking any AmPly window raises the whole AmPly family above other apps.
+  win.on("focus",()=>{
+    for(const other of windows.values())if(other.id!==id&&!other.win.isDestroyed()&&other.win.isVisible()&&!other.win.isMinimized())other.win.moveTop();
+    if(!win.isDestroyed())win.moveTop();
+  });
   win.once("ready-to-show",()=>{win.show();if(!startup)remember(p);});
   void win.loadURL(`${ORIGIN}/`);
   return p;
@@ -144,6 +149,19 @@ ipcMain.on("amply:control",(event,m)=>{
     else {makeWindow("pl","pl");makeWindow("eq","eq");makeWindow("library","library");}
   }else if(m.action==="close"){if(p.kind==="main")app.quit();else{p.win.hide();remember(p);states();}}
   else if(m.action==="minimize")p.win.minimize();
+  else if(m.action==="maximize"){
+    const all=rects();
+    const group=p.kind==="main"?layout.connected(p.id,all,saved.detached):all.filter(r=>r.id===p.id);
+    if(!group.length)return;
+    if(p.maximized&&p.restoreRects){const keep=p.restoreRects;p.maximized=false;p.restoreRects=null;apply(keep);}
+    else{
+      const area=screen.getDisplayMatching(p.win.getBounds()).workArea;
+      const x=Math.min(...group.map(r=>r.x)),y=Math.min(...group.map(r=>r.y));
+      const w=Math.max(...group.map(r=>r.x+r.w))-x,h=Math.max(...group.map(r=>r.y+r.h))-y;
+      p.restoreRects=group;p.maximized=true;
+      apply(layout.resize(layout.move(group,area.x-x,area.y-y),area.w-w,area.h-h));
+    }
+  }
   else if(m.action==="detach"&&typeof m.value==="boolean"){saved.detached=m.value?[...new Set([...saved.detached,p.id])]:saved.detached.filter(id=>id!==p.id);save();states();}
   else if(m.action==="shade"){p.shaded=!p.shaded;if(p.shaded)p.fullHeight=p.win.getBounds().height;p.win.setSize(p.win.getBounds().width,p.shaded?26:p.fullHeight);remember(p);}
   else if(["open","toggle"].includes(m.action)&&typeof m.value==="string"&&m.value.length<300){
