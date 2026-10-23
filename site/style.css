@@ -1,0 +1,27 @@
+:root { --face:#9a9ca3; --hi:#d8d9de; --lo:#4a4b50; --screen:#050805; --green:#3dff6e; --orange:#ff8a1f; }
+* { box-sizing: border-box; }
+body { margin:0; padding:24px 12px; background:#1b1c20 radial-gradient(circle at 50% 0,#2a2b31,#121316); color:var(--green);
+  font:15px/1.5 "Courier New", ui-monospace, monospace; }
+.win { max-width:960px; margin:0 auto 20px; background:var(--face); border:2px solid; border-color:var(--hi) var(--lo) var(--lo) var(--hi); padding:3px; }
+.title { display:flex; align-items:center; gap:8px; padding:3px 6px; color:var(--orange); font-weight:bold; font-size:12px; letter-spacing:1px; background:#5a5c63; }
+.stripes { flex:1; height:6px; background:repeating-linear-gradient(#c9cad0 0 1px,transparent 1px 3px); }
+.x { background:var(--face); color:#111; padding:0 5px; border:1px solid; border-color:var(--hi) var(--lo) var(--lo) var(--hi); }
+.body { background:var(--screen); background-image:linear-gradient(#0d1f0f 1px,transparent 1px),linear-gradient(90deg,#0d1f0f 1px,transparent 1px);
+  background-size:16px 16px; margin:3px 0 0; padding:20px; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo); }
+.hero .body { text-align:center; }
+.logo { width:100%; max-width:560px; display:block; margin:0 auto; }
+.tag { font-size:17px; color:#c8ffd4; }
+em { color:var(--orange); }
+.actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:16px 0; }
+.btn { display:inline-block; padding:8px 16px; background:var(--face); color:#111; text-decoration:none; font-weight:bold;
+  border:2px solid; border-color:var(--hi) var(--lo) var(--lo) var(--hi); }
+.btn:active { border-color:var(--lo) var(--hi) var(--hi) var(--lo); }
+.btn.primary { color:#000; background:var(--orange); }
+.small { font-size:12px; opacity:.75; }
+.features { list-style:none; margin:3px 0 0; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.features li::before { content:"▶ "; color:var(--orange); }
+b { color:var(--orange); }
+.gallery { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+figure { margin:0; } figure img { width:100%; display:block; border:1px solid var(--lo); }
+figcaption { text-align:center; font-size:12px; color:var(--orange); margin-top:4px; }
+footer { text-align:center; font-size:12px; color:#8a8c92; }
