@@ -8,6 +8,7 @@ import { EqualizerWindow } from "./EqualizerWindow";
 import { PluginWindow } from "./PluginWindow";
 import { LibraryWindow } from "./LibraryWindow";
 import { IntroSplash } from "./IntroSplash";
+import { MenuBar } from "./MenuBar";
 import { useMusicLibrary } from "./use-music-library";
 import { PlayerBroadcaster } from "./RemotePlayer";
 import { usePlayer } from "./player-context";
@@ -79,7 +80,13 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
     }}>
     {panel.kind==="main" && <PlayerBroadcaster/>}
     {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={controls}>
-      {panel.kind==="main"?<MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
+      {panel.kind==="main"?<>
+        <MenuBar skin={skin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}}
+          onOpenLibrary={()=>bridge?.control("open","library")} onOpenPlugins={()=>bridge?.control("open","plugins")}
+          onCompact={()=>{setMode("small");bridge?.control("compact");}} onFull={()=>{setMode("large");bridge?.control("full");}}
+          onArrange={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")}/>
+        <MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>
+      </>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
     </NativeFrame>}
     {menu && <div className="wa-menu wa-native-skin-menu" role="menu" aria-label="Skins" style={{left:menu.x,top:menu.y}} onPointerDown={event=>event.stopPropagation()}>
       <div className="wa-menu-head">Skins</div>
