@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:desktop": "vite build -c ./vite.electron.config.ts",
-    "package:win": "bun run build:desktop && node scripts/package-desktop.mjs"
+    "package:win": "bun run build:desktop && node scripts/package-desktop.mjs",
+    "package:linux": "bun run build:desktop && node scripts/package-desktop.mjs linux"
   },
   "overrides": {
     "rolldown": "1.2.1"
