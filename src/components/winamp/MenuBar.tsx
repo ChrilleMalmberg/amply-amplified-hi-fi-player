@@ -21,6 +21,7 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
   const [open, setOpen] = useState<string | null>(null);
   const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
   const [lists, setLists] = useState(false);
+  const enteredAt = useRef(0);
 
   useEffect(() => {
     if (!open) return;
@@ -41,7 +42,11 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
         aria-haspopup="menu"
         aria-expanded={open === id}
         onClick={(e) => {
-          if (open === id) { setOpen(null); return; }
+          if (open === id) {
+            // A hover may have just switched to this menu; the following click must not close it.
+            if (Date.now() - enteredAt.current > 400) setOpen(null);
+            return;
+          }
           const r = e.currentTarget.getBoundingClientRect();
           setAnchor({ x: r.left, y: r.bottom + 2 });
           setOpen(id);
@@ -49,6 +54,7 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
         onPointerEnter={(e) => {
           if (!open || open === id) return;
           const r = e.currentTarget.getBoundingClientRect();
+          enteredAt.current = Date.now();
           setAnchor({ x: r.left, y: r.bottom + 2 });
           setOpen(id);
         }}
