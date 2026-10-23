@@ -16,6 +16,7 @@ import { desktopBridge, useNativePanel } from "@/lib/desktop-bridge";
 import { NativeDesktop } from "./NativeDesktop";
 import { RemotePlayerProvider } from "./RemotePlayer";
 import { PLAYER_SKINS } from "@/lib/player-skins";
+import { MenuBar } from "./MenuBar";
 
 type Pos = { x: number; y: number };
 const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 528 }, plugins: { x: 32, y: 80 } };
@@ -87,6 +88,11 @@ function Shell() {
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Arrange windows" title="Arrange windows" onClick={arrange}><Columns2 /></Button>
         </>}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
+        <MenuBar skin={skin} onSkin={setSkin}
+          onOpenLibrary={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }}
+          onOpenPlugins={() => { setMode("large"); setShowPlugins(true); }}
+          onCompact={() => setMode("small")} onFull={() => setMode("large")}
+          onArrange={arrange} onExit={() => window.close()} />
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {mode === "large" && showPlugins && <WaWindow id="plugins" title="ADVANCED EQ · AUDIO PLUG-INS" width={760} pos={pos["plugins"] ?? DEFAULT.plugins} onMove={mv("plugins")} onClose={() => setShowPlugins(false)}><PluginWindow /></WaWindow>}
