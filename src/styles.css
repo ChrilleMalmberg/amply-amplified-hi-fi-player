@@ -245,7 +245,7 @@
 .wa-menubar-entry { position: relative; }
 .wa-menubar-btn { font-family: "Silkscreen", monospace; font-size: 11px; letter-spacing: 1px; padding: 2px 8px; color: var(--wa-btn-text); background: transparent; border: 1px solid transparent; }
 .wa-menubar-btn:hover, .wa-menubar-btn.wa-open { background: var(--wa-sel); color: var(--wa-cur); }
-.wa-menubar-menu { position: absolute; top: 100%; left: 0; z-index: 60; }
+.wa-menubar-menu { position: fixed; z-index: 60; }
 .wa-menubar-lists { position: absolute; top: 100%; left: 0; right: 0; z-index: 55; background: var(--wa-face); border: 2px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); padding: 4px; }
 .wa-tbtn { width: 16px; height: 16px; line-height: 12px; font-size: 14px; background: var(--wa-face); color: var(--wa-title); border: 1px solid; border-color: var(--wa-hi) var(--wa-lo) var(--wa-lo) var(--wa-hi); }
 

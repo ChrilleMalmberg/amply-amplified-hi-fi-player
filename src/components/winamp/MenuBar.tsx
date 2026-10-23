@@ -19,6 +19,7 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
   const fileRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
+  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
   const [lists, setLists] = useState(false);
 
   useEffect(() => {
@@ -39,12 +40,24 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
         className={`wa-menubar-btn ${open === id ? "wa-open" : ""}`}
         aria-haspopup="menu"
         aria-expanded={open === id}
-        onClick={() => setOpen(open === id ? null : id)}
-        onPointerEnter={() => { if (open) setOpen(id); }}
+        onClick={(e) => {
+          if (open === id) { setOpen(null); return; }
+          const r = e.currentTarget.getBoundingClientRect();
+          setAnchor({ x: r.left, y: r.bottom + 2 });
+          setOpen(id);
+        }}
+        onPointerEnter={(e) => {
+          if (!open || open === id) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          setAnchor({ x: r.left, y: r.bottom + 2 });
+          setOpen(id);
+        }}
       >
         {label}
       </button>
-      {open === id && <div className="wa-menu wa-menubar-menu" role="menu" aria-label={label}>{items}</div>}
+      {open === id && anchor && (
+        <div className="wa-menu wa-menubar-menu" role="menu" aria-label={label} style={{ left: anchor.x, top: anchor.y }}>{items}</div>
+      )}
     </span>
   );
 
