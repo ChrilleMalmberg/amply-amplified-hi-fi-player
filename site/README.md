@@ -1,6 +1,8 @@
 # AmPly website
 
-Plain static HTML/CSS — no build step, no server code. The Download and GitHub buttons in `index.html` point at `github.com/ChrilleMalmberg/amply-amplified-hi-fi-player`.
+Plain static HTML/CSS — no build step, no server code. Includes Windows and Debian Linux downloads and separate step-by-step setup guides. The Download and GitHub buttons in `index.html` point at `github.com/ChrilleMalmberg/amply-amplified-hi-fi-player`.
+
+To update the existing **amply** Cloudflare project: open **Workers & Pages → amply → Create deployment**, upload the latest website ZIP with `index.html` at its top level, then deploy. This updates the website, not the GitHub release attachments.
 
 ## Free hosting on Cloudflare Pages
 
