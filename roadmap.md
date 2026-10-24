@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Add Debian setup help to the website and repository documentation; deliver an updated Cloudflare ZIP
+- [x] Add Debian setup help to the website and repository documentation; deliver an updated Cloudflare ZIP
 - [x] Update amply.win footer and Debian download, verify layout, and deliver a fresh upload ZIP
 - [ ] Activate Debian website download; blocked until the user attaches amply_3.0.0_amd64.deb to the public GitHub v3.0 release (119 MiB exceeds Cloudflare Pages' 25 MiB limit)
 - [x] Winamp 2.0-style player: main, playlist, visuals windows, dragging/snapping, skins, llama intro
