@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AmPly — Amplified Hi-Fi Player</title>
-  <meta name="description" content="AmPly: a free Win95-styled audiophile music player for Windows with a 10-band EQ, music library, snapping windows and skins.">
+  <meta name="description" content="AmPly: a free Win95-styled audiophile music player for Windows and Debian Linux with a 10-band EQ, offline playlists and step-by-step installation help.">
   <meta property="og:title" content="AmPly — Amplified Hi-Fi Player">
-  <meta property="og:description" content="Free retro audiophile music player for Windows.">
+  <meta property="og:description" content="Free retro audiophile music player for Windows and Debian Linux, with offline playlists and clear setup guides.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="style.css">
@@ -22,7 +22,7 @@
         <a class="btn linux" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.0/amply_3.0.0_amd64.deb"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m-5-5l5 5 5-5M4 16v5h16v-5"/></svg>Download for Linux Debian</a>
         <a class="btn" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player">View on GitHub</a>
       </div>
-      <p class="small">Free · Open source · Works offline · Unsigned installer: More info → Run anyway</p>
+      <p class="small">Free · Public source code · Works offline · Windows &amp; Debian Linux</p>
     </div>
   </header>
 
@@ -39,7 +39,7 @@
   </section>
 
   <section class="win" id="setup">
-    <div class="title">GETTING STARTED · SETUP GUIDE <span class="stripes"></span></div>
+    <div class="title">GETTING STARTED · WINDOWS <span class="stripes"></span></div>
     <ol class="body steps">
       <li><b>Download.</b> Click <em>Download for Windows</em> at the top. The setup file saves to your Downloads folder.</li>
       <li><b>Open the file.</b> Double-click the downloaded file. If a blue window says <em>"Windows protected your PC"</em>, click <em>More info</em>, then <em>Run anyway</em>. This appears because AmPly is a free hobby app without a paid Microsoft certificate.</li>
@@ -48,7 +48,19 @@
       <li><b>Add music.</b> Drag songs into the Playlist window, or open the Library window and choose your music folder — it sorts by artist and album automatically. Your files are never moved.</li>
       <li><b>Make it yours.</b> Drag windows close to the player and they snap together. Right-click a window's title to change the skin.</li>
     </ol>
-    <div class="body linux-setup"><b>On Debian Linux (64-bit Intel / AMD):</b> click <em>Download for Linux Debian</em>, then open the downloaded <code>.deb</code> file with your software installer and choose <em>Install</em>. Open AmPly from your applications menu. If your desktop has no installer for <code>.deb</code> files, open a terminal in your Downloads folder and run <code>sudo apt install ./amply_3.0.0_amd64.deb</code>.</div>
+  </section>
+
+  <section class="win" id="linux-setup">
+    <div class="title">GETTING STARTED · DEBIAN LINUX <span class="stripes"></span></div>
+    <ol class="body steps">
+      <li><b>Check your computer.</b> This Linux test version is for Debian-based desktops with a 64-bit Intel or AMD processor. It is not for ARM computers or Raspberry Pi.</li>
+      <li><b>Download or copy from USB.</b> Click <em>Download for Linux Debian</em> above. Save <code>amply_3.0.0_amd64.deb</code> in Downloads. If you brought it on a USB stick, copy it into Downloads first.</li>
+      <li><b>Install.</b> Double-click the <code>.deb</code> file and choose <em>Install</em> if a software installer opens. Enter your account password when asked. Internet may be needed for missing system packages.</li>
+      <li><b>No installer opens?</b> In your file manager, open Downloads, right-click an empty space and choose <em>Open in Terminal</em>. Paste <code>sudo apt install ./amply_3.0.0_amd64.deb</code> and press Enter. Type your password (nothing appears as you type) and confirm if asked.</li>
+      <li><b>Start AmPly.</b> Find <em>AmPly HiFi Player</em> in your applications menu, or type <code>amply</code> in a terminal. Press <em>Power on</em> or <em>Skip</em>. Do not start the player with <code>sudo</code>.</li>
+      <li><b>Add your music.</b> Drag songs into Playlist or choose your music folder in Library. Your original files stay where they are; imported music and playlists work offline after setup.</li>
+      <li><b>Need help?</b> If it will not open, run <code>amply</code> in a terminal and send the error text and your Debian version through <a href="https://chrille.pages.dev/">Contact me</a>. More help is in the <a href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/blob/main/docs/linux-setup.md">Linux setup guide on GitHub</a>.</li>
+    </ol>
   </section>
 
   <section class="win">
