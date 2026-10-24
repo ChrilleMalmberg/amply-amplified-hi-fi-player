@@ -34,6 +34,8 @@ code { color:var(--orange); }
 a:focus-visible { outline:2px solid var(--focus); outline-offset:4px; }
 .linux-setup { font-size:13px; line-height:1.7; }
 .linux-setup code { overflow-wrap:anywhere; }
+.steps code { overflow-wrap:anywhere; }
+.steps a { color:var(--green); text-underline-offset:3px; }
 .site-footer { max-width:960px; margin:28px auto 0; padding:22px 20px 14px; border-top:2px solid var(--lo); background:var(--footer-bg); color:var(--footer-text); text-align:left; }
 .footer-main { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; }
 .quality-seal { display:flex; align-items:center; gap:10px; color:var(--green); font-weight:bold; font-size:14px; }
