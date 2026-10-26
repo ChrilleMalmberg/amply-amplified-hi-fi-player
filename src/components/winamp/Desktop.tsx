@@ -17,6 +17,7 @@ import { NativeDesktop } from "./NativeDesktop";
 import { RemotePlayerProvider } from "./RemotePlayer";
 import { PLAYER_SKINS } from "@/lib/player-skins";
 import { MenuBar } from "./MenuBar";
+import { WinampCommands } from "./WinampCommands";
 
 type Pos = { x: number; y: number };
 const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 528 }, plugins: { x: 32, y: 80 } };
@@ -56,28 +57,12 @@ function Shell() {
     localStorage.setItem("wa-state", JSON.stringify({ v: 4, pos, skin, show }));
   }, [pos, skin, show]);
 
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).closest("input, select, textarea, [aria-label^='Resize']")) return;
-      const m: Record<string, () => void> = {
-        z: p.prev, x: p.play, c: p.pause, v: p.stop, b: p.next,
-        ArrowLeft: () => p.seek(p.time - 5), ArrowRight: () => p.seek(p.time + 5),
-        ArrowUp: () => p.setVolume(p.volume + 0.05), ArrowDown: () => p.setVolume(p.volume - 0.05),
-      };
-      const f = m[e.key];
-      if (f) {
-        e.preventDefault();
-        f();
-      }
-    };
-    window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
-  }, [p]);
-
   const mv = (id: string) => (np: Pos) => setPos((s) => ({ ...s, [id]: np }));
 
   return (
     <div className="wa-desktop" data-skin={skin} data-mode={mode} onClick={() => setMenu(null)}>
+      {!intro && <WinampCommands onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))}
+        onOpenLibrary={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }} />}
       {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
       <WaWindow id="main" title="AMPLY · HIFI PLAYER" pos={mode === "small" ? DEFAULT.main : pos["main"] ?? DEFAULT.main} onMove={mv("main")} width={550}
         controls={<>
@@ -92,7 +77,8 @@ function Shell() {
           onOpenLibrary={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }}
           onOpenPlugins={() => { setMode("large"); setShowPlugins(true); }}
           onCompact={() => setMode("small")} onFull={() => setMode("large")}
-          onArrange={arrange} onExit={() => window.close()} />
+          onArrange={arrange} onExit={() => window.close()}
+          onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
         <MainWindow onTogglePL={() => setShow((s) => ({ ...s, pl: !s.pl }))} onToggleEQ={() => setShow((s) => ({ ...s, eq: !s.eq }))} />
       </WaWindow>
       {mode === "large" && showPlugins && <WaWindow id="plugins" title="ADVANCED EQ · AUDIO PLUG-INS" width={760} pos={pos["plugins"] ?? DEFAULT.plugins} onMove={mv("plugins")} onClose={() => setShowPlugins(false)}><PluginWindow /></WaWindow>}

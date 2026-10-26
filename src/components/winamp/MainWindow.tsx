@@ -2,6 +2,7 @@ import { AmplyLogo } from "./AmplyLogo";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer, AUDIO_ACCEPT } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
+import { openDialog } from "./WinampCommands";
 
 function cssVar(el: Element, n: string) {
   return getComputedStyle(el).getPropertyValue(n).trim();
@@ -72,6 +73,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
   const kbps = t && t.duration ? Math.round((t.file.size * 8) / t.duration / 1000) : 0;
   const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "AMPLY HIFI PLAYER V-3.0  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
   const [remaining, setRemaining] = useState(false);
+  useEffect(() => { const t = () => setRemaining(r => !r); window.addEventListener("amply:toggle-time", t); return () => window.removeEventListener("amply:toggle-time", t); }, []);
   const shown = remaining ? p.duration - p.time : p.time;
 
   return (
@@ -79,7 +81,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
       <input ref={fileRef} type="file" multiple accept={AUDIO_ACCEPT} hidden onChange={(e) => e.target.files && p.addFiles(e.target.files)} />
       <div className="wa-row">
         <div className="wa-lcd wa-display">
-          <div className="wa-status">{p.playing ? (p.paused ? "❚❚" : "▶") : "■"}</div>
+          <div className="wa-status" title={[p.stopAfter && "Stops after this track", p.ab.a !== null && (p.ab.b !== null ? "A-B loop active" : "A set")].filter(Boolean).join(" · ") || undefined}>{p.playing ? (p.paused ? "❚❚" : "▶") : "■"}</div>
           <button className={`wa-time ${p.paused ? "wa-blink" : ""}`} onClick={() => setRemaining((r) => !r)}>
             {remaining ? "-" : " "}
             {fmtTime(shown)}
@@ -122,9 +124,12 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
         <button className="wa-btn" aria-label="Stop" onClick={p.stop}>■</button>
         <button className="wa-btn" aria-label="Next" onClick={p.next}>⏭</button>
         <button className="wa-btn wa-eject" aria-label="Open files" onClick={() => fileRef.current?.click()}>⏏</button>
+        <button className={`wa-toggle ${p.ab.a !== null ? "wa-on" : ""}`} title="A-B repeat (A)" onClick={p.cycleAB}>{p.ab.a === null ? "A-B" : p.ab.b === null ? "A-…" : "A↔B"}</button>
+        <button className={`wa-toggle ${p.stopAfter ? "wa-on" : ""}`} title="Stop after current track (Ctrl+V)" onClick={p.toggleStopAfter}>STOP▸</button>
+        <button className="wa-toggle" title="Jump to file (J)" onClick={() => openDialog("jump-file")}>J</button>
         <span className="wa-spacer" />
         <button className={`wa-toggle ${p.shuffle ? "wa-on" : ""}`} onClick={p.toggleShuffle}>SHUFFLE</button>
-        <button className={`wa-toggle ${p.repeat ? "wa-on" : ""}`} onClick={p.toggleRepeat}>↻</button>
+        <button className={`wa-toggle ${p.repeat ? "wa-on" : ""}`} title={`Repeat: ${p.repeatMode} (R)`} aria-label={`Repeat ${p.repeatMode}`} onClick={p.toggleRepeat}>{p.repeatMode === "track" ? "↻1" : "↻"}</button>
         <AmplyLogo size={14} />
       </div>
     </div>

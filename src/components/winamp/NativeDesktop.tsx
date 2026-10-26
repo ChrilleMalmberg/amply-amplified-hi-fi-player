@@ -9,6 +9,7 @@ import { PluginWindow } from "./PluginWindow";
 import { LibraryWindow } from "./LibraryWindow";
 import { IntroSplash } from "./IntroSplash";
 import { MenuBar } from "./MenuBar";
+import { WinampCommands } from "./WinampCommands";
 import { useMusicLibrary } from "./use-music-library";
 import { PlayerBroadcaster } from "./RemotePlayer";
 import { usePlayer } from "./player-context";
@@ -48,6 +49,9 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
   const p=usePlayer(); const [intro,setIntro]=useState(panel.kind==="main");
   const [skin,setSkin]=useState("silver");const [mode,setMode]=useState("large");
   const [menu,setMenu]=useState<{x:number;y:number}|null>(null);
+  const [onTop,setOnTopS]=useState(false);
+  useEffect(()=>{try{setOnTopS(localStorage.getItem("amply-ontop")==="1");}catch{/* default */}},[]);
+  const setOnTop=(v:boolean)=>{setOnTopS(v);try{localStorage.setItem("amply-ontop",v?"1":"0");}catch{/* storage unavailable */}desktopBridge()?.control("ontop",v);};
   const bridge=desktopBridge();
   useEffect(()=>{
     if(!menu)return;
@@ -79,12 +83,14 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
       setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-164)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-198))});
     }}>
     {panel.kind==="main" && <PlayerBroadcaster/>}
+    {!intro && <WinampCommands onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onOpenLibrary={()=>bridge?.control("open","library")}/>}
     {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={controls}>
       {panel.kind==="main"?<>
         <MenuBar skin={skin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}}
           onOpenLibrary={()=>bridge?.control("open","library")} onOpenPlugins={()=>bridge?.control("open","plugins")}
           onCompact={()=>{setMode("small");bridge?.control("compact");}} onFull={()=>{setMode("large");bridge?.control("full");}}
-          onArrange={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")}/>
+          onArrange={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")}
+          onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onTop={{value:onTop,set:setOnTop}}/>
         <MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>
       </>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
     </NativeFrame>}
