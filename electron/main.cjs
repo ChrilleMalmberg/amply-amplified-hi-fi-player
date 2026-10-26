@@ -42,7 +42,7 @@ const windows = new Map();
 let saved = { windows: {}, detached: [] };
 let started = false, quitting = false, gesture = null, saveTimer;
 const sizes = { main: [550, 220], pl: [550, 300], eq: [550, 260], library: [680, 640], plugins: [760, 740] };
-const titles = { main: "AmPly HiFi Player V-3.0", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
+const titles = { main: "AmPly HiFi Player V-3.4", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
 function dataPath() { return path.join(app.getPath("userData"), "desktop-windows.json"); }
 function rects() {
   return [...windows.values()].filter(p => !p.win.isDestroyed() && p.win.isVisible()).map(p => {
@@ -68,7 +68,8 @@ function states() {
 function apply(rectangles) {
   for(const r of rectangles) {
     const p=windows.get(r.id); if(!p || p.win.isDestroyed()) continue;
-    p.win.setBounds({x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.w),height:Math.round(r.h)});remember(p);
+    const bounds=layout.toBounds(r);if(!bounds)continue;
+    p.win.setBounds(bounds);remember(p);
   }
   states();
 }
@@ -159,10 +160,10 @@ ipcMain.on("amply:control",(event,m)=>{
       let area=screen.getDisplayMatching(p.win.getBounds()).workArea;
       if(!area||area.width<100||area.height<100)area=screen.getPrimaryDisplay().workArea;
       if(!area||area.width<100||area.height<100){const d=screen.getPrimaryDisplay().size;area={x:0,y:0,width:d.width,height:d.height};}
-      const x=Math.min(...group.map(r=>r.x)),y=Math.min(...group.map(r=>r.y));
-      const w=Math.max(...group.map(r=>r.x+r.w))-x,h=Math.max(...group.map(r=>r.y+r.h))-y;
+      const next=layout.maximize(group,area);
+      if(!next.length || !next.every(r=>layout.toBounds(r)))return;
       p.restoreRects=group;p.maximized=true;
-      apply(layout.resize(layout.move(group,area.x-x,area.y-y),area.w-w,area.h-h));
+      apply(next);
     }
   }
   else if(m.action==="detach"&&typeof m.value==="boolean"){saved.detached=m.value?[...new Set([...saved.detached,p.id])]:saved.detached.filter(id=>id!==p.id);save();states();}
