@@ -100,7 +100,7 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
         <span className="wa-title-stripes" />
         <span className="wa-title-text">{title}</span>
         <span className="wa-title-stripes" />
-        {controls}
+        <span className="wa-title-controls">{controls}
         <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`${detached ? "Join" : "Detach"} ${title}`} title={detached ? "Allow snapping and joined resizing" : "Separate from joined resizing"} aria-pressed={!detached} onClick={() => workspace?.detach(id, !detached)}>{detached ? <Unlink /> : <Link2 />}</Button>
         <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={() => setShaded((s) => !s)}>
           _
@@ -110,6 +110,7 @@ export function WaWindow({ id, title, pos, onMove, onClose, width, children, onC
             ×
           </Button>
         )}
+        </span>
       </div>
       {!shaded && <><div className="wa-window-content">{children}</div>
         <div className="wa-resize-edge wa-resize-right" onPointerDown={e => onResize(e, "x")} />

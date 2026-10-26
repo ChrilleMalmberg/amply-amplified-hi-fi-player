@@ -29,7 +29,7 @@ try {
     electronVersion: config.devDependencies.electron.replace(/^[^\d]+/, ""),
     appVersion: config.version, icon: path.join(stage, "electron/icon.ico"),
     out: path.join(tmpdir(), "amply-v3.0-release"), overwrite: true, prune: false,
-    win32metadata: { ProductName: "AmPly HiFi Player", FileDescription: "AmPly HiFi Player V-3.0" },
+    win32metadata: { ProductName: "AmPly HiFi Player", FileDescription: `AmPly HiFi Player V-${config.version}` },
   });
   console.log(platform + " application packaged:", paths.join(", "));
 } finally {

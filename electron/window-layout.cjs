@@ -35,4 +35,15 @@ function restore(rect, areas) {
   if(areas.some(a=>Math.min(rect.x+rect.w,a.x+a.width)-Math.max(rect.x,a.x)>=80 && rect.y>=a.y && rect.y+22<=a.y+a.height)) return rect;
   const a=areas[0]; return a ? {...rect,x:a.x+24,y:a.y+24} : rect;
 }
-module.exports={touching,connected,move,resize,snap,restore};
+function maximize(windows, area) {
+  if (!windows.length || !area || ![area.x,area.y,area.width,area.height].every(Number.isFinite) || area.width<=0 || area.height<=0) return [];
+  const x=Math.min(...windows.map(w=>w.x)), y=Math.min(...windows.map(w=>w.y));
+  const width=Math.max(...windows.map(w=>w.x+w.w))-x, height=Math.max(...windows.map(w=>w.y+w.h))-y;
+  return resize(move(windows,area.x-x,area.y-y),area.width-width,area.height-height);
+}
+function toBounds(rect) {
+  if (!rect || ![rect.x,rect.y,rect.w,rect.h].every(Number.isFinite) || rect.w<1 || rect.h<1) return null;
+  const result={x:Math.round(rect.x),y:Math.round(rect.y),width:Math.round(rect.w),height:Math.round(rect.h)};
+  return Object.values(result).every(n=>n>=-2147483648 && n<=2147483647) ? result : null;
+}
+module.exports={touching,connected,move,resize,snap,restore,maximize,toBounds};

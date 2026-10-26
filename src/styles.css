@@ -238,6 +238,8 @@
 .wa-titlebar { display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 4px; background: var(--wa-title-bg); cursor: grab; touch-action: none; }
 .wa-title-stripes { flex: 1; height: 10px; background: repeating-linear-gradient(to bottom, var(--wa-title) 0 1px, transparent 1px 3px); opacity: .7; }
 .wa-titlebar .wa-title-stripes:first-child { flex: 0 0 12px; }
+.wa-title-controls { display: flex; align-items: center; gap: 3px; margin-left: auto; flex-shrink: 0; }
+.wa-title-controls .wa-tbtn { flex-shrink: 0; }
 .wa-title-text { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--wa-title); letter-spacing: 2px; }
 
 /* Standard menu bar (File / Playlist / View / Settings) */

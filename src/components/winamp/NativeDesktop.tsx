@@ -28,12 +28,13 @@ function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:st
   const shade=()=>{setShaded(v=>!v);bridge?.control("shade");};
   return <div className="wa-window wa-native-window" data-wa-win={panel.id} data-grouped={state.grouped} data-shaded={shaded}>
     <div className="wa-titlebar" onPointerDown={e=>gesture(e,"move")} onDoubleClick={shade}>
-      <span className="wa-title-text">{title}</span><span className="wa-title-stripes"/>{controls}
+      <span className="wa-title-text">{title}</span><span className="wa-title-stripes"/><span className="wa-title-controls">{controls}
       <Button variant="retro" size="retro" className="wa-tbtn" title={state.detached?"Join snapped windows":"Detach window"} aria-label={`${state.detached?"Join":"Detach"} ${title}`} aria-pressed={!state.detached} onClick={()=>bridge?.control("detach",!state.detached)}>{state.detached?<Unlink/>:<Link2/>}</Button>
       <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={shade}><ChevronUp/></Button>
       {panel.kind==="main" && <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Minimize AmPly" title="Minimize app" onClick={()=>bridge?.control("minimize")}><Minus/></Button>}
       <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Maximize ${title}`} title={panel.kind==="main"?"Maximize player and snapped windows":"Maximize window"} onClick={()=>bridge?.control("maximize")}><Square/></Button>
       <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Close ${title}`} title={panel.kind==="main"?"Exit AmPly":"Close window"} onClick={()=>bridge?.control("close")}><X/></Button>
+      </span>
     </div>
     {!shaded && <><div className="wa-window-content">{children}</div>
       <div className="wa-resize-edge wa-resize-right" onPointerDown={e=>gesture(e,"resize","x")}/><div className="wa-resize-edge wa-resize-bottom" onPointerDown={e=>gesture(e,"resize","y")}/>
