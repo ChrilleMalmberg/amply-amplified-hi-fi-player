@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { FolderPlus, Plus, Play, Search, X, Folder, Disc3, Users, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { filterLibrary, GROUP_LABELS, type LibraryGroup } from "@/lib/music-library";
@@ -18,6 +18,27 @@ export function LibraryWindow({ library, onNewWindow, initialSource = "" }: Prop
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const dirRef = useRef<HTMLInputElement>(null);
+  const [cols, setCols] = useState<number[]>(() => { try { return JSON.parse(localStorage.getItem("amply-library-cols") || "") } catch { return [48, 40, 12]; } });
+  const [groupW, setGroupW] = useState(() => Number(localStorage.getItem("amply-library-groupw")) || 175);
+  const tableRef = useRef<HTMLTableElement>(null);
+  const dragCol = (i: number) => (e: RPointerEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    const total = tableRef.current?.clientWidth || 1, x0 = e.clientX, start = [...cols];
+    const move = (ev: PointerEvent) => {
+      const dp = ((ev.clientX - x0) / total) * 100;
+      const a = Math.max(8, (start[i] ?? 0) + dp), b = Math.max(8, (start[i] ?? 0) + (start[i + 1] ?? 0) - a);
+      const next = [...start]; next[i] = (start[i] ?? 0) + (start[i + 1] ?? 0) - b; next[i + 1] = b; setCols(next);
+      localStorage.setItem("amply-library-cols", JSON.stringify(next));
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
+  const dragGroups = (e: RPointerEvent) => {
+    e.preventDefault(); const x0 = e.clientX, w0 = groupW;
+    const move = (ev: PointerEvent) => { const w = Math.max(80, Math.min(500, w0 + ev.clientX - x0)); setGroupW(w); localStorage.setItem("amply-library-groupw", String(w)); };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
   const sources = useMemo(() => [...new Set(library.items.map(i => i.source || "Loose files"))].sort(), [library.items]);
   const groups = useMemo(() => {
     const counts = new Map<string, number>();
@@ -56,13 +77,17 @@ export function LibraryWindow({ library, onNewWindow, initialSource = "" }: Prop
       })}
     </div>
     <div className="wa-library-search"><Search size={16} /><input aria-label="Search music library" value={query} placeholder="Search music…" onChange={e => setQuery(e.target.value)} /><Button variant="retro" size="retro" className="wa-toggle wa-icon-control" aria-label="Clear music search" onClick={() => setQuery("")}><X /></Button></div>
-    <div className="wa-library-body">
+    <div className="wa-library-body" style={{ gridTemplateColumns: `${groupW}px minmax(0, 1fr)` }}>
       <nav className="wa-library-groups" aria-label={GROUP_LABELS[group]}>
         <Button variant="retro" size="retro" className={`wa-group ${!selected ? "wa-selected" : ""}`} onClick={() => setSelected("")}><span>All {GROUP_LABELS[group].toLowerCase()}</span><span>{groups.reduce((sum, [, n]) => sum + n, 0)}</span></Button>
         {groups.map(([name, count]) => <Button key={name} variant="retro" size="retro" className={`wa-group ${selected === name ? "wa-selected" : ""}`} onClick={() => setSelected(name)} title={name}><span>{name}</span><span>{count}</span></Button>)}
       </nav>
+      <span className="wa-col-grip" style={{ left: groupW - 3, right: "auto" }} role="separator" aria-label="Resize categories" onPointerDown={dragGroups} />
       <div className="wa-library-tracks">
-        <table><thead><tr><th>Title</th><th>Artist / Album</th><th>Time</th></tr></thead><tbody>
+        <table ref={tableRef}><colgroup>{cols.map((w, i) => <col key={i} style={{ width: `${w}%` }} />)}</colgroup><thead><tr>
+          <th style={{ position: "sticky" }}>Title<span className="wa-col-grip" role="separator" aria-label="Resize Title column" onPointerDown={dragCol(0)} /></th>
+          <th style={{ position: "sticky" }}>Artist / Album<span className="wa-col-grip" role="separator" aria-label="Resize Artist column" onPointerDown={dragCol(1)} /></th>
+          <th>Time</th></tr></thead><tbody>
           {rows.map((item, i) => <tr key={`${item.folder}/${item.file.name}/${i}`}><td><Button variant="retro" size="retro" className="wa-track-title" onClick={() => play([item])} title={`Play ${item.title}`}><Play size={12} /><span>{item.title}</span></Button></td><td><span>{item.artist}</span><small>{item.album}</small></td><td>{item.duration ? fmtTime(item.duration) : "—"}</td></tr>)}
         </tbody></table>
         {!rows.length && <div className="wa-pl-empty">{!library.ready ? "Loading music…" : library.items.length ? "No matching music" : "No folders added"}</div>}
