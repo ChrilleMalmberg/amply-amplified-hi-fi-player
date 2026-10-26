@@ -1,6 +1,7 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { nextIndex, prevIndex, readTags } from "@/lib/winamp-logic";
+import { indexAfterEnd, nextRepeat, type RepeatMode } from "@/lib/winamp-features";
 import { QUEUE_KEY, loadPlaylist, savePlaylist, type StoredItem } from "@/lib/playlist-store";
 import { applyEqualizer, effectiveBalance, normalizeEqGain, type AudioCapabilities } from "@/lib/audio-plugins";
 
@@ -70,11 +71,16 @@ function usePlayerState() {
   balanceState.current = { enabled: balanceEnabled, value: balance };
   const [audioCapabilities, setAudioCapabilities] = useState<AudioCapabilities>({ equalizer: false, balance: false });
   const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>("off");
+  const repeat = repeatMode !== "off";
+  const [stopAfter, setStopAfter] = useState(false);
+  const [ab, setAbS] = useState<{ a: number | null; b: number | null }>({ a: null, b: null });
+  const abRef = useRef(ab); abRef.current = ab;
+  const fadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [sampleRate, setSampleRate] = useState(44100);
   const [skipped, setSkipped] = useState<string[]>([]);
-  const st = useRef({ tracks, current, shuffle, repeat });
-  st.current = { tracks, current, shuffle, repeat };
+  const st = useRef({ tracks, current, shuffle, repeat, repeatMode, stopAfter });
+  st.current = { tracks, current, shuffle, repeat, repeatMode, stopAfter };
 
   const ensureGraph = useCallback(() => {
     const a = audioRef.current;
@@ -131,7 +137,11 @@ function usePlayerState() {
     a.preload = "auto";
     a.volume = 0.8;
     audioRef.current = a;
-    const onTime = () => setTime(a.currentTime);
+    const onTime = () => {
+      const { a: A, b: B } = abRef.current;
+      if (A !== null && B !== null && a.currentTime >= B) a.currentTime = A;
+      setTime(a.currentTime);
+    };
     const onPlay = () => {
       setPlaying(true);
       setPaused(false);
@@ -139,7 +149,8 @@ function usePlayerState() {
     const onPause = () => setPaused(true);
     const onEnded = () => {
       const s = st.current;
-      const n = nextIndex(s.current, s.tracks.length, s);
+      const n = indexAfterEnd(s.current, s.tracks.length, { shuffle: s.shuffle, repeat: s.repeatMode, stopAfter: s.stopAfter });
+      if (s.stopAfter) setStopAfter(false);
       if (n >= 0) playAt(n);
       else {
         setPlaying(false);
@@ -350,7 +361,29 @@ function usePlayerState() {
     },
     setBalanceEnabled: (enabled: boolean) => saveBalance(enabled, balance),
     toggleShuffle: () => setShuffle((s) => !s),
-    toggleRepeat: () => setRepeat((s) => !s),
+    toggleRepeat: () => setRepeatMode((m) => nextRepeat(m)),
+    repeatMode,
+    setRepeatMode,
+    stopAfter,
+    toggleStopAfter: () => setStopAfter((v) => !v),
+    ab,
+    /** Winamp-style A-B loop: first press sets A, second sets B, third clears. */
+    cycleAB: () => {
+      const el = a(); if (!el) return;
+      setAbS((s) => s.a === null ? { a: el.currentTime, b: null } : s.b === null && el.currentTime > s.a + 0.5 ? { a: s.a, b: el.currentTime } : { a: null, b: null });
+    },
+    /** Fade the output volume out over ~1.5 s, then stop and restore the volume setting. */
+    fadeStop: () => {
+      const el = a(); if (!el || el.paused) { api.stop(); return; }
+      if (fadeRef.current) return;
+      const start = el.volume; let step = 0;
+      fadeRef.current = setInterval(() => {
+        step += 1; el.volume = Math.max(0, start * (1 - step / 30));
+        if (step >= 30) { clearInterval(fadeRef.current!); fadeRef.current = null; el.pause(); el.currentTime = 0; el.volume = start; setTime(0); setPlaying(false); setPaused(false); }
+      }, 50);
+    },
+    seekBy: (d: number) => { const el = a(); if (el && el.src) el.currentTime = Math.max(0, Math.min((el.duration || 0) - 0.05, el.currentTime + d)); },
+    volumeBy: (d: number) => { const el = a(); const c = Math.min(1, Math.max(0, (el?.volume ?? volume) + d)); setVolumeS(c); if (el) el.volume = c; },
     eq,
     eqPresetName,
     setEqOn: (on: boolean) => updateEq({ ...eq, on }),
