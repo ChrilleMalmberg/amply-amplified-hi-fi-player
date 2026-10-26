@@ -18,3 +18,4 @@
 - Startup sound uses a short-lived independent Web Audio graph started by the power button and closed on skip/completion/unmount; it must never change the music player's graph or saved audio settings.
 - Browser and native panels share the player-skins catalog; native skin changes preserve other wa-state fields and synchronize through storage events so every desktop panel keeps the same appearance.
 - The separate static marketing site lives in site/; link large desktop installers to public GitHub release assets rather than bundling them, because Cloudflare Pages limits individual files to 25 MiB.
+- Winamp-style shortcuts and utility dialogs live in WinampCommands (one per window, opened via window "amply:dialog" events); pure playback/playlist rules live in src/lib/winamp-features.ts with tests, so browser, main and remote panels behave the same.
