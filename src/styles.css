@@ -545,7 +545,7 @@
 .wa-menu-item:disabled { opacity: .45; pointer-events: none; }
 .wa-menubar-menu, .wa-pl-menu { max-height: 80vh; overflow-y: auto; }
 .wa-pl-group { position: relative; display: inline-block; }
-.wa-pl-menu { position: absolute; bottom: 100%; left: 0; margin-bottom: 2px; min-width: 240px; }
+.wa-pl-menu { min-width: 240px; }
 .wa-dialog-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: color-mix(in oklab, var(--wa-lo) 45%, transparent); }
 .wa-dialog { position: relative; width: min(460px, 94vw); max-height: 86vh; display: flex; flex-direction: column; }
 .wa-dialog-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: auto; color: var(--wa-lcd-text); background: var(--wa-face); font-size: 18px; }

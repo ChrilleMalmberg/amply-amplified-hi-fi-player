@@ -15,6 +15,7 @@ export function PlaylistWindow() {
   const [over, setOver] = useState(false);
   const [lists, setLists] = useState(false);
   const [menu, setMenu] = useState<string | null>(null);
+  const [menuAt, setMenuAt] = useState({ x: 0, bottom: 0 });
   const [note, setNote] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const dirRef = useRef<HTMLInputElement>(null);
@@ -92,8 +93,8 @@ export function PlaylistWindow() {
   );
   const group = (id: string, label: string, items: ReactNode) => (
     <span className="wa-pl-group">
-      <button className={`wa-toggle ${menu === id ? "wa-on" : ""}`} aria-haspopup="menu" aria-expanded={menu === id} onClick={() => setMenu(m => m === id ? null : id)}>{label}</button>
-      {menu === id && <div className="wa-menu wa-pl-menu" role="menu" aria-label={label}>{items}</div>}
+      <button className={`wa-toggle ${menu === id ? "wa-on" : ""}`} aria-haspopup="menu" aria-expanded={menu === id} onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setMenuAt({ x: r.left, bottom: window.innerHeight - r.top + 2 }); setMenu(m => m === id ? null : id); }}>{label}</button>
+      {menu === id && <div className="wa-menu wa-pl-menu" role="menu" aria-label={label} style={{ left: menuAt.x, bottom: menuAt.bottom }}>{items}</div>}
     </span>
   );
   const none = sel.size === 0;
