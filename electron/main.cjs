@@ -149,6 +149,7 @@ ipcMain.on("amply:control",(event,m)=>{
     else {makeWindow("pl","pl");makeWindow("eq","eq");makeWindow("library","library");}
   }else if(m.action==="close"){if(p.kind==="main")app.quit();else{p.win.hide();remember(p);states();}}
   else if(m.action==="minimize")p.win.minimize();
+  else if(m.action==="ontop"&&typeof m.value==="boolean"){saved.onTop=m.value;for(const w of windows.values())w.win.setAlwaysOnTop(m.value);save();}
   else if(m.action==="maximize"){
     const all=rects();
     const group=p.kind==="main"?layout.connected(p.id,all,saved.detached):all.filter(r=>r.id===p.id);

@@ -3,9 +3,9 @@ import { PlayerContext, usePlayer, type PlayerApi, type Track } from "./player-c
 
 const CHANNEL = "amply-desktop-player-v1";
 type Message = { type: string; id?: string; method?: string; args?: unknown[]; state?: Partial<PlayerApi>; tracks?: Track[]; result?: unknown; error?: string };
-const METHODS = ["ensureGraph", "addFiles", "playAt", "loadItems", "appendItems", "playItems", "saveAs", "play", "pause", "stop", "next", "prev", "seek", "setVolume", "setBalance", "setBalanceEnabled", "toggleShuffle", "toggleRepeat", "setEqOn", "resetEq", "setEqBand", "setEqPreamp", "applyEqPreset"] as const;
+const METHODS = ["ensureGraph", "addFiles", "playAt", "loadItems", "appendItems", "playItems", "saveAs", "play", "pause", "stop", "next", "prev", "seek", "setVolume", "setBalance", "setBalanceEnabled", "toggleShuffle", "toggleRepeat", "setRepeatMode", "toggleStopAfter", "cycleAB", "fadeStop", "seekBy", "volumeBy", "setEqOn", "resetEq", "setEqBand", "setEqPreamp", "applyEqPreset"] as const;
 function stateOf(p: PlayerApi): Partial<PlayerApi> {
-  return { current:p.current,playing:p.playing,paused:p.paused,time:p.time,volume:p.volume,balance:p.balance,balanceEnabled:p.balanceEnabled,audioCapabilities:p.audioCapabilities,shuffle:p.shuffle,repeat:p.repeat,sampleRate:p.sampleRate,skipped:p.skipped,duration:p.duration,eq:p.eq,eqPresetName:p.eqPresetName };
+  return { current:p.current,playing:p.playing,paused:p.paused,time:p.time,volume:p.volume,balance:p.balance,balanceEnabled:p.balanceEnabled,audioCapabilities:p.audioCapabilities,shuffle:p.shuffle,repeat:p.repeat,repeatMode:p.repeatMode,stopAfter:p.stopAfter,ab:p.ab,sampleRate:p.sampleRate,skipped:p.skipped,duration:p.duration,eq:p.eq,eqPresetName:p.eqPresetName };
 }
 export function PlayerBroadcaster() {
   const p=usePlayer(); const latest=useRef(p); latest.current=p;
@@ -35,7 +35,7 @@ export function PlayerBroadcaster() {
   return null;
 }
 export function RemotePlayerProvider({children}:{children:ReactNode}) {
-  const [snapshot,setSnapshot]=useState<Partial<PlayerApi>>({tracks:[],current:-1,playing:false,paused:false,time:0,volume:.8,balance:0,balanceEnabled:true,audioCapabilities:{equalizer:false,balance:false},shuffle:false,repeat:false,sampleRate:44100,skipped:[],duration:0,eq:{on:false,preamp:0,bands:Array(10).fill(0)},eqPresetName:null});
+  const [snapshot,setSnapshot]=useState<Partial<PlayerApi>>({tracks:[],current:-1,playing:false,paused:false,time:0,volume:.8,balance:0,balanceEnabled:true,audioCapabilities:{equalizer:false,balance:false},shuffle:false,repeat:false,repeatMode:"off",stopAfter:false,ab:{a:null,b:null},sampleRate:44100,skipped:[],duration:0,eq:{on:false,preamp:0,bands:Array(10).fill(0)},eqPresetName:null});
   const latest=useRef(snapshot); latest.current=snapshot;
   const channel=useRef<BroadcastChannel | null>(null);
   const pending=useRef(new Map<string,{resolve:(value:unknown)=>void;reject:(error:Error)=>void;timer:ReturnType<typeof setTimeout>}>());

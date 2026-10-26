@@ -124,6 +124,7 @@ function usePlayerState() {
       const t = st.current.tracks[i];
       if (!a || !t) return;
       ensureGraph();
+      setAbS({ a: null, b: null });
       setCurrent(i);
       if (a.src !== t.url) a.src = t.url;
       a.currentTime = 0;

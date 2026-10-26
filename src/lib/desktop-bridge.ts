@@ -4,7 +4,7 @@ export type NativePanel = { id: string; kind: "main" | "pl" | "eq" | "library" |
 export type NativeWindowState = { detached: boolean; grouped: boolean };
 export type DesktopBridge = {
   info: () => Promise<NativePanel>;
-  control: (action: "ready" | "open" | "toggle" | "close" | "minimize" | "maximize" | "arrange" | "compact" | "full" | "shade" | "detach", value?: string | boolean) => void;
+  control: (action: "ready" | "open" | "toggle" | "close" | "minimize" | "maximize" | "arrange" | "compact" | "full" | "shade" | "detach" | "ontop", value?: string | boolean) => void;
   gesture: (action: "move" | "resize" | "end", axis?: "both" | "x" | "y") => void;
   onWindowState: (callback: (state: NativeWindowState) => void) => () => void;
 };
