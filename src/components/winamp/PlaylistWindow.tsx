@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { usePlayer, AUDIO_ACCEPT, type Track } from "./player-context";
 import { fmtTime } from "@/lib/winamp-logic";
 import { moveSelected, playlistEntries, randomize, removeDuplicates, sortTracks, toM3U } from "@/lib/winamp-features";
@@ -94,7 +95,7 @@ export function PlaylistWindow() {
   const group = (id: string, label: string, items: ReactNode) => (
     <span className="wa-pl-group">
       <button className={`wa-toggle ${menu === id ? "wa-on" : ""}`} aria-haspopup="menu" aria-expanded={menu === id} onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setMenuAt({ x: r.left, bottom: window.innerHeight - r.top + 2 }); setMenu(m => m === id ? null : id); }}>{label}</button>
-      {menu === id && <div className="wa-menu wa-pl-menu" role="menu" aria-label={label} style={{ left: menuAt.x, bottom: menuAt.bottom }}>{items}</div>}
+      {menu === id && createPortal(<div className="wa-menu wa-pl-menu" role="menu" aria-label={label} data-skin={rootRef.current?.closest("[data-skin]")?.getAttribute("data-skin") ?? undefined} style={{ left: menuAt.x, bottom: menuAt.bottom }}>{items}</div>, rootRef.current?.closest(".wa-desktop") ?? document.body)}
     </span>
   );
   const none = sel.size === 0;
