@@ -90,7 +90,7 @@ function makeWindow(id,kind,source="",startup=false) {
     backgroundColor:"#0b130e",title:titles[kind],icon:path.join(__dirname,"icon.ico"),autoHideMenuBar:true,
     webPreferences:{preload:path.join(__dirname,"preload.cjs"),sandbox:true,contextIsolation:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:"no-user-gesture-required"},
   });
-  const p={id,kind,source,win,shaded:false,fullHeight:rect.h};windows.set(id,p);
+  const p={id,kind,source,win,shaded:false,fullHeight:rect.h};windows.set(id,p);if(saved.onTop)win.setAlwaysOnTop(true);
   win.webContents.setWindowOpenHandler(({ url: u }) => {
     if (/^https:\/\//.test(u)) void shell.openExternal(u);return {action:"deny"};
   });
@@ -192,7 +192,7 @@ else app.whenReady().then(async()=>{
   Menu.setApplicationMenu(null);
   try {
     const raw=JSON.parse(fs.readFileSync(dataPath(),"utf8"));
-    if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string")};
+    if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string"),onTop:raw.onTop===true};
   }catch{/* defaults */}
   try{await startServer();makeWindow("main","main","",true);}catch{dialog.showErrorBox("AmPly cannot start","The local player address is busy or unavailable. Close other copies of AmPly and try again.");app.quit();}
   const recover=()=>{endGesture();const areas=screen.getAllDisplays().map(d=>d.workArea);apply(rects().map(r=>layout.restore(r,areas)).filter(Boolean));};
