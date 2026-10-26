@@ -18,7 +18,7 @@ Or connect the repository so every push redeploys automatically:
 
 ## Download files
 
-Windows downloads directly from the latest public GitHub release (`AmPly-V3.1.exe`).
+Windows downloads directly from the latest public GitHub release (`AmPly-V3.4-Setup.exe`).
 Debian downloads directly from release `v3.0` (`amply_3.0.0_amd64.deb`). **Attach that Debian file to the existing v3.0 release before uploading this website update.** GitHub → Releases → edit v3.0 → attach the Debian file → Update release. Keep its filename unchanged.
 
 The Debian installer is about 119 MiB, exceeding Cloudflare Pages' 25 MiB per-file limit, so neither installer is included in the website ZIP. GitHub serves the downloads for free. The website remains a small static upload. See https://developers.cloudflare.com/pages/platform/limits/.

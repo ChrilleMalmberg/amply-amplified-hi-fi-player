@@ -33,7 +33,7 @@ AmPly is a Win95-styled, sharp-edged audiophile music player with modern functio
 
 ## Windows app
 
-Download [the Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/latest/download/AmPly-V3.1.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
+Download [the Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/latest/download/AmPly-V3.4-Setup.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
 
 Build it yourself:
 
