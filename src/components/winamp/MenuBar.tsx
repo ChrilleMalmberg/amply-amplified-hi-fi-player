@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { usePlayer, AUDIO_ACCEPT } from "./player-context";
+import { usePlayer } from "./player-context";
 import { PlaylistManager } from "./PlaylistManager";
 import { PLAYER_SKINS } from "@/lib/player-skins";
+import { openDialog, toggleTimeDisplay } from "./WinampCommands";
 
 type MenuBarProps = {
   skin: string;
@@ -12,11 +13,13 @@ type MenuBarProps = {
   onFull: () => void;
   onArrange: () => void;
   onExit: () => void;
+  onTogglePL?: () => void;
+  onToggleEQ?: () => void;
+  onTop?: { value: boolean; set: (v: boolean) => void };
 };
 
-export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit }: MenuBarProps) {
+export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit, onTogglePL, onToggleEQ, onTop }: MenuBarProps) {
   const p = usePlayer();
-  const fileRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
@@ -34,6 +37,9 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
 
   const item = (label: ReactNode, action: () => void) => (
     <button className="wa-menu-item" role="menuitem" onClick={() => { setOpen(null); action(); }}>{label}</button>
+  );
+  const check = (on: boolean, label: ReactNode, action: () => void) => (
+    <button className="wa-menu-item" role="menuitemcheckbox" aria-checked={on} onClick={() => { setOpen(null); action(); }}>{on ? "✓ " : "  "}{label}</button>
   );
   const menu = (id: string, label: string, items: ReactNode) => (
     <span className="wa-menubar-entry">
@@ -69,17 +75,46 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
 
   return (
     <div className="wa-menubar" ref={rootRef} onPointerDown={(e) => e.stopPropagation()}>
-      <input ref={fileRef} type="file" multiple accept={AUDIO_ACCEPT} hidden onChange={(e) => e.target.files && p.addFiles(e.target.files)} />
       {menu("file", "File", <>
-        {item("Open files…", () => fileRef.current?.click())}
-        {item("Music library", onOpenLibrary)}
+        {item("Play file…  (L)", () => openDialog("open-files"))}
+        {item("Add folder…  (Shift+L)", () => openDialog("open-folder"))}
+        {item("Music library  (Alt+L)", onOpenLibrary)}
+        <div className="wa-menu-sep" />
+        {item("Jump to file…  (J)", () => openDialog("jump-file"))}
+        {item("Jump to time…  (Ctrl+J)", () => openDialog("jump-time"))}
+        {item("File info…  (Alt+3)", () => openDialog("file-info"))}
+        <div className="wa-menu-sep" />
         {item("Exit AmPly", onExit)}
+      </>)}
+      {menu("play", "Play", <>
+        {item("Previous  (Z)", p.prev)}
+        {item("Play  (X)", p.play)}
+        {item("Pause  (C)", p.pause)}
+        {item("Stop  (V)", p.stop)}
+        {item("Fade out and stop  (Shift+V)", p.fadeStop)}
+        {check(p.stopAfter, "Stop after current  (Ctrl+V)", p.toggleStopAfter)}
+        {item("Next  (B)", p.next)}
+        <div className="wa-menu-sep" />
+        {item("Back 5 seconds  (←)", () => p.seekBy(-5))}
+        {item("Forward 5 seconds  (→)", () => p.seekBy(5))}
+        {item("Volume up  (↑)", () => p.volumeBy(0.05))}
+        {item("Volume down  (↓)", () => p.volumeBy(-0.05))}
+        <div className="wa-menu-sep" />
+        {check(p.shuffle, "Shuffle  (S)", p.toggleShuffle)}
+        <div className="wa-menu-head">Repeat  (R)</div>
+        {check(p.repeatMode === "off", "Repeat off", () => p.setRepeatMode("off"))}
+        {check(p.repeatMode === "all", "Repeat playlist", () => p.setRepeatMode("all"))}
+        {check(p.repeatMode === "track", "Repeat track", () => p.setRepeatMode("track"))}
+        {check(p.ab.a !== null, p.ab.a === null ? "A-B repeat: set A  (A)" : p.ab.b === null ? "A-B repeat: set B  (A)" : "A-B repeat: clear  (A)", p.cycleAB)}
       </>)}
       {menu("playlist", "Playlist", <>
         {item("Save / load playlists…", () => setLists((v) => !v))}
-        {item("Clear playlist", () => p.setTracks([]))}
+        {onTogglePL && item("Show / hide playlist  (Alt+E)", onTogglePL)}
+        {item("Clear playlist", () => { p.stop(); p.setTracks([]); })}
       </>)}
       {menu("view", "View", <>
+        {item("Elapsed / remaining time  (Ctrl+T)", toggleTimeDisplay)}
+        {onToggleEQ && item("Show / hide equalizer  (Alt+G)", onToggleEQ)}
         {item("Compact player", onCompact)}
         {item("Full player", onFull)}
         {item("Reset windows", onArrange)}
@@ -90,8 +125,13 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
           </button>
         ))}
       </>)}
-      {menu("settings", "Settings", <>
+      {menu("settings", "Options", <>
         {item("Audio plug-ins / Advanced EQ", onOpenPlugins)}
+        {onTop && check(onTop.value, "Always on top", () => onTop.set(!onTop.value))}
+      </>)}
+      {menu("help", "Help", <>
+        {item("Keyboard shortcuts  (F1)", () => openDialog("shortcuts"))}
+        {item("About AmPly", () => openDialog("about"))}
       </>)}
       {lists && <div className="wa-menubar-lists"><PlaylistManager onClose={() => setLists(false)} /></div>}
     </div>

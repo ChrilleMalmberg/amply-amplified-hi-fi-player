@@ -539,3 +539,20 @@
 .wa-native-desktop .wa-titlebar { gap: 3px; }
 .wa-native-desktop .wa-title-text { font-size: 10px; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wa-native-desktop .wa-title-stripes { min-width: 0; }
+
+/* Winamp-style command dialogs and playlist editor menus */
+.wa-menu-sep { height: 0; margin: 3px 2px; border-top: 1px solid var(--wa-lo); border-bottom: 1px solid var(--wa-hi); }
+.wa-menu-item:disabled { opacity: .45; pointer-events: none; }
+.wa-menubar-menu, .wa-pl-menu { max-height: 80vh; overflow-y: auto; }
+.wa-pl-group { position: relative; display: inline-block; }
+.wa-pl-menu { min-width: 240px; }
+.wa-dialog-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: color-mix(in oklab, var(--wa-lo) 45%, transparent); }
+.wa-dialog { position: relative; width: min(460px, 94vw); max-height: 86vh; display: flex; flex-direction: column; }
+.wa-dialog-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: auto; color: var(--wa-lcd-text); background: var(--wa-face); font-size: 18px; }
+.wa-dialog-input { width: 100%; padding: 2px 6px; font: inherit; color: var(--wa-lcd-text); background: var(--wa-lcd); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-dialog-list { height: 220px; overflow-y: auto; background: var(--wa-lcd); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-dialog-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.wa-dialog-table { border-collapse: collapse; width: 100%; }
+.wa-dialog-table th { text-align: left; padding: 1px 10px 1px 0; white-space: nowrap; vertical-align: top; color: var(--wa-spec-hi, inherit); font-weight: normal; }
+.wa-dialog-table td { padding: 1px 0; word-break: break-all; }
+.wa-pl:focus { outline: none; }

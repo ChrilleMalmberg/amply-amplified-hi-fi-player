@@ -30,9 +30,12 @@
 - [x] Deliver the revised v3.0 Windows installer
 - [x] Confirm Windows installation launches independent windows (user confirmation); physical multi-monitor behavior remains untested
 - [x] Restore the native right-click skin menu, verify synchronized saved skins in real Electron windows, and deliver an updated installer
-- [ ] Raise all AmPly windows when any window is clicked (native)
-- [ ] Fix Nucleo/Matrix button text contrast
-- [ ] Standard right-side titlebar buttons + per-window maximize (group maximize with player)
-- [ ] Standard menu bar (File/Playlist/View/Settings) on the player
-- [ ] Add Modern skin (MusicBee-inspired)
-- [ ] Verify, package and deliver updated installer
+- [x] Raise all AmPly windows when any window is clicked (native)
+- [x] Fix Nucleo/Matrix button text contrast
+- [x] Standard right-side titlebar buttons + per-window maximize (group maximize with player)
+- [x] Standard menu bar (File/Playlist/View/Settings) on the player
+- [x] Add Modern skin (MusicBee-inspired)
+- [x] Verify, package and deliver updated installer
+- [x] Winamp-style menus (File/Play/Playlist/View/Options/Help), shortcuts, jump to file/time, file info, repeat track, stop after current, fade stop, A-B repeat, always on top
+- [x] Playlist editor ADD/REM/SEL/MISC/LIST tools with sort, randomize, duplicates, M3U/PLS import and M3U export
+- [x] Rebuild Windows installer (AmPly-V3.2-Setup.exe)
