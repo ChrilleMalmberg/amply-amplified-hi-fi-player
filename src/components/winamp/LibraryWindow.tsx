@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { FolderPlus, Plus, Play, Search, X, Folder, Disc3, Users, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { filterLibrary, GROUP_LABELS, type LibraryGroup } from "@/lib/music-library";
@@ -21,7 +21,7 @@ export function LibraryWindow({ library, onNewWindow, initialSource = "" }: Prop
   const [cols, setCols] = useState<number[]>(() => { try { return JSON.parse(localStorage.getItem("amply-library-cols") || "") } catch { return [48, 40, 12]; } });
   const [groupW, setGroupW] = useState(() => Number(localStorage.getItem("amply-library-groupw")) || 175);
   const tableRef = useRef<HTMLTableElement>(null);
-  const dragCol = (i: number) => (e: React.PointerEvent) => {
+  const dragCol = (i: number) => (e: RPointerEvent) => {
     e.preventDefault(); e.stopPropagation();
     const total = tableRef.current?.clientWidth || 1, x0 = e.clientX, start = [...cols];
     const move = (ev: PointerEvent) => {
@@ -33,7 +33,7 @@ export function LibraryWindow({ library, onNewWindow, initialSource = "" }: Prop
     const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   };
-  const dragGroups = (e: React.PointerEvent) => {
+  const dragGroups = (e: RPointerEvent) => {
     e.preventDefault(); const x0 = e.clientX, w0 = groupW;
     const move = (ev: PointerEvent) => { const w = Math.max(80, Math.min(500, w0 + ev.clientX - x0)); setGroupW(w); localStorage.setItem("amply-library-groupw", String(w)); };
     const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
