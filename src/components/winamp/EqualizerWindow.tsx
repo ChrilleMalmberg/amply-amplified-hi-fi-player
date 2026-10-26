@@ -29,7 +29,7 @@ export function EqualizerWindow({ onAdvanced }: { onAdvanced?: () => void }) {
     <div className="wa-eq">
       <div className="wa-eq-top">
         <Button variant="retro" size="retro" aria-label="Equalizer on" aria-pressed={p.eq.on} className={`wa-toggle ${p.eq.on ? "wa-state-on" : "wa-state-off"}`} onClick={() => p.setEqOn(!p.eq.on)}>
-          ON
+          {p.eq.on ? "ON" : "OFF"}
         </Button>
         <span className="wa-eq-scale">+12db</span>
         <Button variant="retro" size="retro"
