@@ -30,6 +30,13 @@ export function WinampCommands({ onTogglePL, onToggleEQ, onOpenLibrary }: Props)
   }, []);
 
   useEffect(() => {
+    if (!dialog) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setDialog(null); };
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [dialog]);
+
+  useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.defaultPrevented || (e.target as HTMLElement).closest("input, select, textarea, [role='dialog']")) return;
       const { p, onTogglePL, onToggleEQ, onOpenLibrary } = latest.current;
