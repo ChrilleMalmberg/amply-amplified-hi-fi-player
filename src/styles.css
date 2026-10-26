@@ -549,8 +549,8 @@
 .wa-dialog-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: color-mix(in oklab, var(--wa-lo) 45%, transparent); }
 .wa-dialog { position: relative; width: min(460px, 94vw); max-height: 86vh; display: flex; flex-direction: column; }
 .wa-dialog-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: auto; color: var(--wa-lcd-text); background: var(--wa-face); font-size: 18px; }
-.wa-dialog-input { width: 100%; padding: 2px 6px; font: inherit; color: var(--wa-lcd-text); background: var(--wa-lcd-bg, var(--wa-lo)); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
-.wa-dialog-list { height: 220px; overflow-y: auto; background: var(--wa-lcd-bg, var(--wa-lo)); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-dialog-input { width: 100%; padding: 2px 6px; font: inherit; color: var(--wa-lcd-text); background: var(--wa-lcd); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
+.wa-dialog-list { height: 220px; overflow-y: auto; background: var(--wa-lcd); border: 2px solid; border-color: var(--wa-lo) var(--wa-hi) var(--wa-hi) var(--wa-lo); }
 .wa-dialog-actions { display: flex; gap: 6px; justify-content: flex-end; }
 .wa-dialog-table { border-collapse: collapse; width: 100%; }
 .wa-dialog-table th { text-align: left; padding: 1px 10px 1px 0; white-space: nowrap; vertical-align: top; color: var(--wa-spec-hi, inherit); font-weight: normal; }
