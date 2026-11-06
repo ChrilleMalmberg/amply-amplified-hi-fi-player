@@ -1,17 +1,17 @@
-; AmPly HiFi Player V-3.4 installer
+; AmPly HiFi Player V-3.1 installer
 Unicode true
 !ifndef PACKAGE_DIR
   !define PACKAGE_DIR "..\electron-release\Ampli Player-win32-x64"
 !endif
 !ifndef INSTALLER_OUT
-  !define INSTALLER_OUT "..\electron-release\AmPly-V3.4-Setup.exe"
+  !define INSTALLER_OUT "..\electron-release\AmPly-V3.1-Setup.exe"
 !endif
-Name "AmPly HiFi Player V-3.4"
+Name "AmPly HiFi Player V-3.1"
 OutFile "${INSTALLER_OUT}"
-VIProductVersion "3.4.0.0"
+VIProductVersion "3.1.0.0"
 VIAddVersionKey "ProductName" "AmPly HiFi Player"
-VIAddVersionKey "FileDescription" "AmPly HiFi Player V-3.4 Setup"
-VIAddVersionKey "FileVersion" "3.4.0"
+VIAddVersionKey "FileDescription" "AmPly HiFi Player V-3.1 Setup"
+VIAddVersionKey "FileVersion" "3.1.0"
 InstallDir "$LOCALAPPDATA\Programs\Ampli Player"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
@@ -31,8 +31,8 @@ Section "Install"
   CreateDirectory "$SMPROGRAMS\AmPly HiFi Player"
   CreateShortcut "$SMPROGRAMS\AmPly HiFi Player\AmPly HiFi Player.lnk" "$INSTDIR\Ampli Player.exe"
   CreateShortcut "$SMPROGRAMS\AmPly HiFi Player\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayName" "AmPly HiFi Player V-3.4"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayVersion" "3.4"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayName" "AmPly HiFi Player V-3.1"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayVersion" "3.1"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "UninstallString" "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "DisplayIcon" "$INSTDIR\Ampli Player.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\AmpliPlayer" "Publisher" "AmPly HiFi Player"

@@ -18,11 +18,11 @@
       <img src="img/amply-logo.jpg" alt="AmPly logo" class="logo">
       <p class="tag">A reverse-engineered tribute to the classic Winamp 2 — <em>because it really whipped the Llama's ass.</em></p>
       <div class="actions">
-        <a class="btn primary" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/latest/download/AmPly-V3.4-Setup.exe"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5l8-1v7H3zm10-1l8-1v8h-8zM3 13h8v7l-8-1zm10 0h8v8l-8-1z" fill="currentColor" stroke="none"/></svg>Download for Windows</a>
-        <a class="btn linux" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.0/amply_3.0.0_amd64.deb"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m-5-5l5 5 5-5M4 16v5h16v-5"/></svg>Download for Linux Debian</a>
+        <a class="btn primary" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.1/AmPly-V3.1-Setup.exe"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5l8-1v7H3zm10-1l8-1v8h-8zM3 13h8v7l-8-1zm10 0h8v8l-8-1z" fill="currentColor" stroke="none"/></svg>Download for Windows</a>
+        <a class="btn linux" href="#linux-setup"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m-5-5l5 5 5-5M4 16v5h16v-5"/></svg>Linux Debian status</a>
         <a class="btn" href="https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player">View on GitHub</a>
       </div>
-      <p class="small">Free · Public source code · Works offline · Windows &amp; Debian Linux</p>
+      <p class="small">v3.1 · Free · Public source code · Works offline · Windows desktop</p>
     </div>
   </header>
 
@@ -52,9 +52,10 @@
 
   <section class="win" id="linux-setup">
     <div class="title">GETTING STARTED · DEBIAN LINUX <span class="stripes"></span></div>
+    <p class="body">The Debian installer is not currently available in the public releases. The source and build instructions remain available on GitHub. Installation instructions below apply once a Debian package is published.</p>
     <ol class="body steps">
       <li><b>Check your computer.</b> This Linux test version is for Debian-based desktops with a 64-bit Intel or AMD processor. It is not for ARM computers or Raspberry Pi.</li>
-      <li><b>Download or copy from USB.</b> Click <em>Download for Linux Debian</em> above. Save <code>amply_3.0.0_amd64.deb</code> in Downloads. If you brought it on a USB stick, copy it into Downloads first.</li>
+      <li><b>Download or copy from USB when available.</b> Save the published <code>amply_3.0.0_amd64.deb</code> release asset in Downloads. If you brought it on a USB stick, copy it into Downloads first.</li>
       <li><b>Install.</b> Double-click the <code>.deb</code> file and choose <em>Install</em> if a software installer opens. Enter your account password when asked. Internet may be needed for missing system packages.</li>
       <li><b>No installer opens?</b> In your file manager, open Downloads, right-click an empty space and choose <em>Open in Terminal</em>. Paste <code>sudo apt install ./amply_3.0.0_amd64.deb</code> and press Enter. Type your password (nothing appears as you type) and confirm if asked.</li>
       <li><b>Start AmPly.</b> Find <em>AmPly HiFi Player</em> in your applications menu, or type <code>amply</code> in a terminal. Press <em>Power on</em> or <em>Skip</em>. Do not start the player with <code>sudo</code>.</li>

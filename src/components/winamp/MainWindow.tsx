@@ -71,7 +71,7 @@ export function MainWindow({ onTogglePL, onToggleEQ }: { onTogglePL: () => void;
   const fileRef = useRef<HTMLInputElement>(null);
   const t = p.tracks[p.current];
   const kbps = t && t.duration ? Math.round((t.file.size * 8) / t.duration / 1000) : 0;
-  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "AMPLY HIFI PLAYER V-3.0  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
+  const title = t ? `${p.current + 1}. ${t.title} (${fmtTime(t.duration)})  ***  ` : "AMPLY HIFI PLAYER V-3.1  ***  BIT-PERFECT LOSSLESS PLAYBACK  ***  ";
   const [remaining, setRemaining] = useState(false);
   useEffect(() => { const t = () => setRemaining(r => !r); window.addEventListener("amply:toggle-time", t); return () => window.removeEventListener("amply:toggle-time", t); }, []);
   const shown = remaining ? p.duration - p.time : p.time;

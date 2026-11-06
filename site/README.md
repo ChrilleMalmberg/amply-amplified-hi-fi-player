@@ -1,6 +1,6 @@
 # AmPly website
 
-Plain static HTML/CSS — no build step, no server code. Includes Windows and Debian Linux downloads and separate step-by-step setup guides. The Download and GitHub buttons in `index.html` point at `github.com/ChrilleMalmberg/amply-amplified-hi-fi-player`.
+Plain static HTML/CSS — no build step, no server code. Includes the Windows download, Debian availability status and setup guides. The Download and GitHub buttons in `index.html` point at `github.com/ChrilleMalmberg/amply-amplified-hi-fi-player`.
 
 To update the existing **amply** Cloudflare project: open **Workers & Pages → amply → Create deployment**, upload the latest website ZIP with `index.html` at its top level, then deploy. This updates the website, not the GitHub release attachments.
 
@@ -18,8 +18,8 @@ Or connect the repository so every push redeploys automatically:
 
 ## Download files
 
-Windows downloads directly from the latest public GitHub release (`AmPly-V3.4-Setup.exe`).
-Debian downloads directly from release `v3.0` (`amply_3.0.0_amd64.deb`). **Attach that Debian file to the existing v3.0 release before uploading this website update.** GitHub → Releases → edit v3.0 → attach the Debian file → Update release. Keep its filename unchanged.
+Windows downloads directly from the v3.1 public GitHub release (`AmPly-V3.1-Setup.exe`). The release workflow verifies and publishes this file after building on Windows.
+Debian currently links to its availability notice because no Debian package is attached to the public releases. Restore a download link only after its release asset exists.
 
 The Debian installer is about 119 MiB, exceeding Cloudflare Pages' 25 MiB per-file limit, so neither installer is included in the website ZIP. GitHub serves the downloads for free. The website remains a small static upload. See https://developers.cloudflare.com/pages/platform/limits/.
 

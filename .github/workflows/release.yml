@@ -1,0 +1,92 @@
+name: Build and release AmPly v3.1
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: amply-v3.1-release
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run test
+      - run: bunx tsc --noEmit
+      - run: bun run build
+
+  windows-release:
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      AMPLY_RELEASE_DIR: ${{ runner.temp }}\amply-v3.1-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - name: Check release version
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          if ($version -ne '3.1.0') { throw "This workflow only releases 3.1.0" }
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run package:win
+      - name: Install desktop test driver and installer compiler
+        run: |
+          npm install --prefix "$env:RUNNER_TEMP\amply-e2e" playwright@1.56.1 --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          choco install nsis --no-progress -y
+      - name: Test packaged Windows application
+        env:
+          AMPLY_PLAYWRIGHT_PATH: ${{ runner.temp }}\amply-e2e\node_modules\playwright
+        run: node scripts/smoke-desktop.cjs "$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64\Ampli Player.exe"
+      - name: Compile and test the Windows installer
+        env:
+          AMPLY_PLAYWRIGHT_PATH: ${{ runner.temp }}\amply-e2e\node_modules\playwright
+        run: |
+          $installer = "$env:AMPLY_RELEASE_DIR\AmPly-V3.1-Setup.exe"
+          & "${env:ProgramFiles(x86)}\NSIS\makensis.exe" "/DPACKAGE_DIR=$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64" "/DINSTALLER_OUT=$installer" electron/installer.nsi
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $installed = "$env:RUNNER_TEMP\amply-installed"
+          $process = Start-Process -FilePath $installer -ArgumentList "/S", "/D=$installed" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
+          node scripts/smoke-desktop.cjs "$installed\Ampli Player.exe"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $hash = (Get-FileHash -Algorithm SHA256 $installer).Hash.ToLower()
+          "$hash  AmPly-V3.1-Setup.exe" | Set-Content -Encoding ascii "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt"
+          Compress-Archive -Path site\* -DestinationPath "$env:AMPLY_RELEASE_DIR\amply-website-v3.1.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: amply-v3.1-release
+          path: |
+            ${{ env.AMPLY_RELEASE_DIR }}\AmPly-V3.1-Setup.exe
+            ${{ env.AMPLY_RELEASE_DIR }}\SHA256SUMS.txt
+            ${{ env.AMPLY_RELEASE_DIR }}\amply-website-v3.1.zip
+      - name: Publish the verified installer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          gh release view v3.1 --json tagName
+          if ($LASTEXITCODE -eq 0) { Write-Host 'v3.1 already exists; published assets were preserved.'; exit 0 }
+          gh release create v3.1 "$env:AMPLY_RELEASE_DIR\AmPly-V3.1-Setup.exe" "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt" "$env:AMPLY_RELEASE_DIR\amply-website-v3.1.zip" --target "$env:RELEASE_COMMIT" --title "AmPly v3.1" --notes-file docs/release-v3.1.md --latest

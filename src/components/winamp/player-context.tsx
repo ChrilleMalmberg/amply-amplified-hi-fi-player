@@ -51,6 +51,7 @@ export const usePlayer = () => {
 
 function usePlayerState() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const metadataRef = useRef(new Map<string, HTMLAudioElement>());
   const ctxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const pannerRef = useRef<StereoPannerNode | null>(null);
@@ -65,6 +66,8 @@ function usePlayerState() {
   const [paused, setPaused] = useState(false);
   const [time, setTime] = useState(0);
   const [volume, setVolumeS] = useState(0.8);
+  const volumeRef = useRef(volume);
+  volumeRef.current = volume;
   const [balance, setBalanceS] = useState(0);
   const [balanceEnabled, setBalanceEnabledS] = useState(true);
   const balanceState = useRef({ enabled: balanceEnabled, value: balance });
@@ -81,6 +84,67 @@ function usePlayerState() {
   const [skipped, setSkipped] = useState<string[]>([]);
   const st = useRef({ tracks, current, shuffle, repeat, repeatMode, stopAfter });
   st.current = { tracks, current, shuffle, repeat, repeatMode, stopAfter };
+  const queueRevision = useRef(0);
+
+  const releaseMetadata = useCallback((url: string) => {
+    const el = metadataRef.current.get(url);
+    if (!el) return;
+    el.onloadedmetadata = null;
+    el.onerror = null;
+    el.removeAttribute("src");
+    el.load();
+    metadataRef.current.delete(url);
+  }, []);
+
+  const cancelFade = useCallback(() => {
+    if (fadeRef.current === null) return;
+    clearInterval(fadeRef.current);
+    fadeRef.current = null;
+    if (audioRef.current) audioRef.current.volume = volumeRef.current;
+  }, []);
+
+  const resetPlayback = useCallback(
+    (unload = false) => {
+      cancelFade();
+      const el = audioRef.current;
+      if (el) {
+        el.pause();
+        if (unload) {
+          el.removeAttribute("src");
+          el.load();
+        } else el.currentTime = 0;
+      }
+      setPlaying(false);
+      setPaused(false);
+      setTime(0);
+      setAbS({ a: null, b: null });
+    },
+    [cancelFade],
+  );
+
+  /** All queue edits preserve the playing track by ID, including remote panel edits. */
+  const updateTracks = useCallback(
+    (update: React.SetStateAction<Track[]>) => {
+      const old = st.current;
+      const next = typeof update === "function" ? update(old.tracks) : update;
+      const active = old.tracks[old.current];
+      const current = active ? next.findIndex((t) => t.id === active.id) : -1;
+      if (active && current < 0) resetPlayback(true);
+      const retained = new Set(next.map((t) => t.url));
+      old.tracks.forEach((t) => {
+        if (!retained.has(t.url)) {
+          releaseMetadata(t.url);
+          URL.revokeObjectURL(t.url);
+        }
+      });
+      // Update synchronously: several edits/commands can arrive before React renders.
+      st.current = { ...old, tracks: next, current };
+      queueRevision.current += 1;
+      setTracks(next);
+      setCurrent(current);
+    },
+    [releaseMetadata, resetPlayback],
+  );
 
   const ensureGraph = useCallback(() => {
     const a = audioRef.current;
@@ -123,14 +187,17 @@ function usePlayerState() {
       const a = audioRef.current;
       const t = st.current.tracks[i];
       if (!a || !t) return;
+      cancelFade();
       ensureGraph();
       setAbS({ a: null, b: null });
+      st.current = { ...st.current, current: i };
       setCurrent(i);
+      setTime(0);
       if (a.src !== t.url) a.src = t.url;
       a.currentTime = 0;
       void a.play().catch(() => {});
     },
-    [ensureGraph],
+    [cancelFade, ensureGraph],
   );
 
   useEffect(() => {
@@ -138,6 +205,7 @@ function usePlayerState() {
     a.preload = "auto";
     a.volume = 0.8;
     audioRef.current = a;
+    const metadata = metadataRef.current;
     const onTime = () => {
       const { a: A, b: B } = abRef.current;
       if (A !== null && B !== null && a.currentTime >= B) a.currentTime = A;
@@ -163,62 +231,100 @@ function usePlayerState() {
     a.addEventListener("pause", onPause);
     a.addEventListener("ended", onEnded);
     return () => {
-      a.pause();
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("play", onPlay);
       a.removeEventListener("pause", onPause);
       a.removeEventListener("ended", onEnded);
+      cancelFade();
+      a.pause();
+      a.removeAttribute("src");
+      a.load();
+      audioRef.current = null;
+      for (const url of metadata.keys()) releaseMetadata(url);
+      st.current.tracks.forEach(t => URL.revokeObjectURL(t.url));
+      void ctxRef.current?.close();
+      ctxRef.current = null;
+      analyserRef.current = null;
+      pannerRef.current = null;
+      eqPreampRef.current = null;
+      eqBandsRef.current = [];
     };
-  }, [playAt]);
+  }, [cancelFade, playAt, releaseMetadata]);
 
-  const addFiles = useCallback(async (files: FileList | File[]) => {
-    const probe = audioRef.current;
-    const list = Array.from(files).filter((f) => f.type.startsWith("audio/") || AUDIO_EXT.test(f.name));
-    const bad: string[] = [];
-    const added: Track[] = [];
-    for (const f of list) {
-      if (probe && f.type && probe.canPlayType(f.type) === "") {
-        bad.push(f.name);
-        continue;
+  const addFiles = useCallback(
+    async (files: FileList | File[]) => {
+      const probe = audioRef.current;
+      const list = Array.from(files).filter(
+        (f) => f.type.startsWith("audio/") || AUDIO_EXT.test(f.name),
+      );
+      const bad: string[] = [];
+      const added: Track[] = [];
+      for (const f of list) {
+        if (probe && f.type && probe.canPlayType(f.type) === "") {
+          bad.push(f.name);
+          continue;
+        }
+        const tags = await readTags(f).catch(() => ({}) as { title?: string; artist?: string });
+        if (audioRef.current !== probe) {
+          added.forEach((t) => URL.revokeObjectURL(t.url));
+          return;
+        }
+        const base = f.name.replace(/\.[^.]+$/, "");
+        const title = tags.title
+          ? tags.artist
+            ? `${tags.artist} - ${tags.title}`
+            : tags.title
+          : base;
+        const t: Track = {
+          id: idRef.current++,
+          file: f,
+          url: URL.createObjectURL(f),
+          title,
+          duration: 0,
+        };
+        added.push(t);
       }
-      const tags = await readTags(f).catch(() => ({}) as { title?: string; artist?: string });
-      const base = f.name.replace(/\.[^.]+$/, "");
-      const title = tags.title ? (tags.artist ? `${tags.artist} - ${tags.title}` : tags.title) : base;
-      const t: Track = { id: idRef.current++, file: f, url: URL.createObjectURL(f), title, duration: 0 };
-      added.push(t);
-      const m = new Audio();
-      m.preload = "metadata";
-      m.onloadedmetadata = () =>
-        setTracks((ts) => ts.map((x) => (x.id === t.id ? { ...x, duration: m.duration } : x)));
-      m.onerror = () => setSkipped((s) => [...s, f.name]);
-      m.src = t.url;
-    }
-    setSkipped(bad);
-    setTracks((ts) => [...ts, ...added]);
-  }, []);
+      setSkipped(bad);
+      if (!added.length) return;
+      updateTracks((ts) => [...ts, ...added]);
+      // Commit every row before probing: metadata for early files may arrive while
+      // readTags is still awaiting later files in a large import.
+      for (const t of added) {
+        const m = new Audio();
+        metadataRef.current.set(t.url, m);
+        m.preload = "metadata";
+        m.onloadedmetadata = () => {
+          const duration = Number.isFinite(m.duration) ? m.duration : 0;
+          updateTracks((ts) => ts.map((x) => (x.id === t.id ? { ...x, duration } : x)));
+          releaseMetadata(t.url);
+        };
+        m.onerror = () => {
+          setSkipped((s) => [...s, t.file.name]);
+          releaseMetadata(t.url);
+        };
+        m.src = t.url;
+      }
+    },
+    [releaseMetadata, updateTracks],
+  );
 
   /** Replace the queue with stored items (keeps original file bytes). */
-  const loadItems = useCallback((items: StoredItem[]) => {
-    const el = audioRef.current;
-    if (el) {
-      el.pause();
-      el.removeAttribute("src");
-    }
-    setPlaying(false);
-    setPaused(false);
-    setTime(0);
-    setCurrent(-1);
-    setTracks((old) => {
-      old.forEach((t) => URL.revokeObjectURL(t.url));
-      return items.map((it) => ({
-        id: idRef.current++,
-        file: it.file,
-        url: URL.createObjectURL(it.file),
-        title: it.title,
-        duration: it.duration,
-      }));
-    });
-  }, []);
+  const loadItems = useCallback(
+    (items: StoredItem[]) => {
+      resetPlayback(true);
+      st.current = { ...st.current, current: -1 };
+      updateTracks(
+        items.map((it) => ({
+          id: idRef.current++,
+          file: it.file,
+          url: URL.createObjectURL(it.file),
+          title: it.title,
+          duration: it.duration,
+        })),
+      );
+    },
+    [resetPlayback, updateTracks],
+  );
 
   const toItems = useCallback(
     (ts: Track[]): StoredItem[] => ts.map((t) => ({ file: t.file, title: t.title, duration: t.duration })),
@@ -226,20 +332,34 @@ function usePlayerState() {
   );
 
   // Restore the last queue on first load, then keep it saved automatically.
-  const restored = useRef(false);
+  const [restoreStatus, setRestoreStatus] = useState<"pending" | "loaded" | "failed">("pending");
   useEffect(() => {
+    let active = true;
+    const revision = queueRevision.current;
     loadPlaylist(QUEUE_KEY)
-      .then((p) => p && p.items.length && loadItems(p.items))
-      .catch(() => {})
-      .finally(() => (restored.current = true));
+      .then((p) => {
+        // Never replace music the user added while IndexedDB was still opening.
+        if (active && queueRevision.current === revision && p?.items.length) loadItems(p.items);
+        if (active) setRestoreStatus("loaded");
+      })
+      .catch(() => {
+        if (active) setRestoreStatus("failed");
+      });
+    return () => {
+      active = false;
+    };
   }, [loadItems]);
   useEffect(() => {
-    if (!restored.current) return;
+    if (restoreStatus === "pending") return;
+    // A failed read must not overwrite an existing queue with the initial empty state.
+    if (restoreStatus === "failed" && queueRevision.current === 0) return;
     const h = setTimeout(() => {
-      void savePlaylist({ name: QUEUE_KEY, items: toItems(tracks), savedAt: Date.now() }).catch(() => {});
+      void savePlaylist({ name: QUEUE_KEY, items: toItems(tracks), savedAt: Date.now() }).catch(
+        () => {},
+      );
     }, 800);
     return () => clearTimeout(h);
-  }, [tracks, toItems]);
+  }, [restoreStatus, tracks, toItems]);
 
   const updateEq = useCallback((next: EqState) => {
     const normalized = { ...next, preamp: normalizeEqGain(next.preamp), bands: next.bands.map(normalizeEqGain) };
@@ -276,22 +396,19 @@ function usePlayerState() {
   }));
   const appendItems = (items: StoredItem[]) => {
     const added = tracksFromItems(items);
-    setTracks(old => [...old, ...added]);
+    updateTracks(old => [...old, ...added]);
   };
   const playItems = (items: StoredItem[]) => {
     if (!items.length) return;
     const added = tracksFromItems(items);
-    const el = audioRef.current;
-    el?.pause();
-    st.current = { ...st.current, tracks: added, current: 0 };
-    setTracks(old => { old.forEach(t => URL.revokeObjectURL(t.url)); return added; });
+    updateTracks(added);
     playAt(0);
   };
 
   const a = () => audioRef.current;
   const api = {
     tracks,
-    setTracks,
+    setTracks: updateTracks,
     current,
     playing,
     paused,
@@ -316,6 +433,7 @@ function usePlayerState() {
     play: () => {
       const el = a();
       if (!el) return;
+      cancelFade();
       if (current < 0 || !el.src) {
         if (tracks.length) playAt(current < 0 ? 0 : current);
         return;
@@ -327,18 +445,11 @@ function usePlayerState() {
     pause: () => {
       const el = a();
       if (!el || !playing) return;
+      cancelFade();
       if (el.paused) void el.play();
       else el.pause();
     },
-    stop: () => {
-      const el = a();
-      if (!el) return;
-      el.pause();
-      el.currentTime = 0;
-      setTime(0);
-      setPlaying(false);
-      setPaused(false);
-    },
+    stop: () => resetPlayback(),
     next: () => {
       const n = nextIndex(current, tracks.length, { shuffle, repeat: true });
       if (n >= 0) playAt(n);
@@ -352,6 +463,7 @@ function usePlayerState() {
       if (el && isFinite(s)) el.currentTime = Math.max(0, s);
     },
     setVolume: (v: number) => {
+      cancelFade();
       const c = Math.min(1, Math.max(0, v));
       setVolumeS(c);
       const el = a();
@@ -384,7 +496,7 @@ function usePlayerState() {
       }, 50);
     },
     seekBy: (d: number) => { const el = a(); if (el && el.src) el.currentTime = Math.max(0, Math.min((el.duration || 0) - 0.05, el.currentTime + d)); },
-    volumeBy: (d: number) => { const el = a(); const c = Math.min(1, Math.max(0, (el?.volume ?? volume) + d)); setVolumeS(c); if (el) el.volume = c; },
+    volumeBy: (d: number) => { cancelFade(); const el = a(); const c = Math.min(1, Math.max(0, (el?.volume ?? volume) + d)); setVolumeS(c); if (el) el.volume = c; },
     eq,
     eqPresetName,
     setEqOn: (on: boolean) => updateEq({ ...eq, on }),
