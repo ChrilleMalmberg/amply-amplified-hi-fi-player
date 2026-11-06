@@ -34,10 +34,10 @@ jobs:
     defaults:
       run:
         shell: pwsh
-    env:
-      AMPLY_RELEASE_DIR: ${{ runner.temp }}\amply-v3.1-release
     steps:
       - uses: actions/checkout@v4
+      - name: Set release directory
+        run: '"AMPLY_RELEASE_DIR=$env:RUNNER_TEMP\amply-v3.1-release" >> $env:GITHUB_ENV'
       - uses: actions/setup-node@v4
         with:
           node-version: 22
