@@ -70,7 +70,7 @@ export function WinampCommands({ onTogglePL, onToggleEQ, onOpenLibrary }: Props)
           <table className="wa-dialog-table"><tbody>{SHORTCUTS.map(([k, d]) => <tr key={k}><th>{k}</th><td>{d}</td></tr>)}</tbody></table>
         </Frame>}
         {dialog === "about" && <Frame title="ABOUT AMPLY" close={() => setDialog(null)}>
-          <p>AmPly HiFi Player V-3.0 — a free, open hobby player with classic Winamp-style controls.</p>
+          <p>AmPly HiFi Player V-3.1 — a free, open hobby player with classic Winamp-style controls.</p>
           <p>Independent project, not affiliated with Winamp or Nullsoft. All features are rebuilt in AmPly's own code.</p>
         </Frame>}
       </div>

@@ -33,7 +33,7 @@ AmPly is a Win95-styled, sharp-edged audiophile music player with modern functio
 
 ## Windows app
 
-Download [the Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/latest/download/AmPly-V3.4-Setup.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
+Download [the v3.1 Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.1/AmPly-V3.1-Setup.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
 
 Build it yourself:
 
@@ -44,7 +44,7 @@ bun run package:win
 
 ## Debian / Linux app
 
-Download [`amply_3.0.0_amd64.deb`](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.0/amply_3.0.0_amd64.deb) from the **v3.0 release**. This link works once the Debian file has been attached to that release.
+The Debian installer is not currently attached to the [public releases](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases). Build from source below, or use these instructions when `amply_3.0.0_amd64.deb` becomes available.
 
 1. Save the file in **Downloads**, or copy it from your USB stick into Downloads.
 2. Double-click the `.deb` file and choose **Install** if your desktop offers a software installer.
@@ -69,7 +69,7 @@ bun install
 bun run package:linux
 ```
 
-This command stages the Linux application under `/tmp/amply-v3.0-release`; it does not automatically assemble a Debian installer.
+This command stages the Linux application under `/tmp/amply-v3.1-release`; it does not automatically assemble a Debian installer.
 
 ## Development
 

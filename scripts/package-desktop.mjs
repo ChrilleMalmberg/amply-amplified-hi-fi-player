@@ -1,5 +1,4 @@
-import { execFileSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { packager } from "@electron/packager";
@@ -19,8 +18,8 @@ try {
   const pointerPath = path.join(root, "src/assets/amply-official-startup.jpg.asset.json");
   const logo = JSON.parse(await readFile(pointerPath, "utf8"));
   const logoPath = path.join(stage, "dist-electron/client", logo.url.replace(/^\//, ""));
-  await mkdir(path.dirname(logoPath), { recursive: true });
-  execFileSync("lovable-assets", ["get", "--file", pointerPath, "--output", logoPath], { stdio: "inherit" });
+  // The startup artwork ships in public/assets; packaging works without Lovable tooling.
+  await access(logoPath);
   await writeFile(path.join(stage, "package.json"), JSON.stringify({
     name: "amply-hifi-player", version: config.version, main: "electron/main.cjs", description: "AmPly HiFi Player", author: "AmPly",
   }, null, 2));
@@ -28,7 +27,7 @@ try {
     dir: stage, name: "Ampli Player", platform, arch: "x64",
     electronVersion: config.devDependencies.electron.replace(/^[^\d]+/, ""),
     appVersion: config.version, icon: path.join(stage, "electron/icon.ico"),
-    out: path.join(tmpdir(), "amply-v3.0-release"), overwrite: true, prune: false,
+    out: process.env.AMPLY_RELEASE_DIR || path.join(tmpdir(), "amply-v3.1-release"), overwrite: true, prune: false,
     win32metadata: { ProductName: "AmPly HiFi Player", FileDescription: `AmPly HiFi Player V-${config.version}` },
   });
   console.log(platform + " application packaged:", paths.join(", "));

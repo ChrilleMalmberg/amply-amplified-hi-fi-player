@@ -42,7 +42,7 @@ const windows = new Map();
 let saved = { windows: {}, detached: [] };
 let started = false, quitting = false, gesture = null, saveTimer;
 const sizes = { main: [550, 220], pl: [550, 300], eq: [550, 260], library: [680, 640], plugins: [760, 740] };
-const titles = { main: "AmPly HiFi Player V-3.4", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
+const titles = { main: "AmPly HiFi Player V-3.1", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
 function dataPath() { return path.join(app.getPath("userData"), "desktop-windows.json"); }
 function rects() {
   return [...windows.values()].filter(p => !p.win.isDestroyed() && p.win.isVisible()).map(p => {
