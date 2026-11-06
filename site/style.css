@@ -47,3 +47,7 @@ a:focus-visible { outline:2px solid var(--focus); outline-offset:4px; }
 .footer-links a:hover { color:var(--orange); text-decoration:underline; text-underline-offset:4px; }
 .disclaimer { border-top:1px solid var(--lo); padding-top:13px; margin:18px 0 0; font-size:11px; color:var(--footer-muted); }
 @media (max-width:600px) { .footer-main { align-items:flex-start; flex-direction:column; gap:16px; } .footer-links { gap:8px 18px; } .actions .btn { width:100%; } .gallery { grid-template-columns:minmax(0,1fr); } }
+
+/* Explicit defaults keep the standalone and app-hosted landing page identical. */
+p { margin:1em 0; }
+.steps { list-style-type:decimal; }
