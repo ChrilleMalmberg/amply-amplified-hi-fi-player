@@ -23,7 +23,7 @@ function startServer() {
         const relative = path.relative(ROOT, file);
         if (relative.startsWith("..") || path.isAbsolute(relative)) { res.writeHead(403); res.end(); return; }
         if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-          if (url === "/") file = path.join(ROOT, "_shell.html");
+          if (url === "/") file = path.join(ROOT, "desktop.html");
           else { res.writeHead(404); res.end(); return; }
         }
         res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream", "X-Content-Type-Options": "nosniff" });

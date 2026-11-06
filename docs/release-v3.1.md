@@ -9,6 +9,7 @@ Reliability update for the Windows desktop player and browser app.
 - Multi-file imports reliably load every duration and release temporary resources.
 - Library startup handles server rendering and damaged saved layout settings.
 - The official startup artwork ships with the app and works offline without Lovable asset tooling.
+- Independent desktop panels start from a dedicated client-only document, avoiding web-shell hydration errors.
 - Version labels and the Windows download link consistently identify v3.1.
 
 Download **AmPly-V3.1-Setup.exe**. The installer is unsigned. Only run the installer downloaded from this repository's release; its SHA-256 is in **SHA256SUMS.txt**.
