@@ -46,10 +46,7 @@ export function PlaylistWindow() {
     });
   };
   const keep = (fn: (ts: Track[]) => Track[]) => {
-    const cur = p.tracks[p.current];
-    const next = fn(p.tracks);
-    if (cur && !next.some(t => t.id === cur.id)) p.stop();
-    p.setTracks(next);
+    p.setTracks(fn);
   };
   const remove = () => { keep(ts => ts.filter(t => !sel.has(t.id))); setSel(new Set()); };
   const crop = () => { keep(ts => ts.filter(t => sel.has(t.id))); };

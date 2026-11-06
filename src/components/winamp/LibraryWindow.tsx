@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { FolderPlus, Plus, Play, Search, X, Folder, Disc3, Users, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { filterLibrary, GROUP_LABELS, type LibraryGroup } from "@/lib/music-library";
@@ -18,8 +18,29 @@ export function LibraryWindow({ library, onNewWindow, initialSource = "" }: Prop
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const dirRef = useRef<HTMLInputElement>(null);
-  const [cols, setCols] = useState<number[]>(() => { try { return JSON.parse(localStorage.getItem("amply-library-cols") || "") } catch { return [48, 40, 12]; } });
-  const [groupW, setGroupW] = useState(() => Number(localStorage.getItem("amply-library-groupw")) || 175);
+  const [cols, setCols] = useState<number[]>([48, 40, 12]);
+  const [groupW, setGroupW] = useState(175);
+  useEffect(() => {
+    // Read browser-only storage after hydration; keep invalid saved layouts usable.
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem("amply-library-cols") || "null");
+      if (
+        Array.isArray(saved) &&
+        saved.length === 3 &&
+        saved.every((w) => typeof w === "number" && Number.isFinite(w) && w >= 8)
+      )
+        setCols(saved);
+    } catch {
+      /* keep default columns */
+    }
+    try {
+      const saved = Number(localStorage.getItem("amply-library-groupw"));
+      if (Number.isFinite(saved) && saved >= 80) setGroupW(Math.min(500, saved));
+    } catch {
+      /* keep default category width */
+    }
+  }, []);
+
   const tableRef = useRef<HTMLTableElement>(null);
   const dragCol = (i: number) => (e: RPointerEvent) => {
     e.preventDefault(); e.stopPropagation();
