@@ -115,6 +115,24 @@ beforeEach(() => {
 });
 
 describe("File import metadata", () => {
+  it("never resumes playback when pause-only commands arrive before a React update", async () => {
+    const { result, audio } = await player();
+    const plays = audio.play.mock.calls.length;
+    act(() => { result.current.pauseOnly(); result.current.pauseOnly(); });
+    expect(audio.paused).toBe(true);
+    expect(audio.play.mock.calls.length).toBe(plays);
+  });
+
+  it("mutes the actual audio element without destroying its volume", async () => {
+    const { result, audio } = await player();
+    act(() => result.current.setVolume(0.42));
+    act(() => result.current.setMuted(true));
+    expect(result.current.muted).toBe(true);
+    expect((audio as TestAudio & { muted: boolean }).muted).toBe(true);
+    expect(audio.volume).toBe(0.42);
+    act(() => result.current.setMuted(false));
+    expect(audio.volume).toBe(0.42);
+  });
   it("keeps durations even when metadata arrives before the import finishes", async () => {
     TestAudio.metadataImmediately = true;
     const { result } = renderHook(usePlayer, { wrapper: PlayerProvider });

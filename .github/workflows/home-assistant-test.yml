@@ -1,0 +1,68 @@
+name: Test optional Home Assistant connection
+on:
+  push:
+    branches: [feature/home-assistant-bridge]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: amply-ha-test-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run test
+      - run: bun run test:bridge
+      - run: bunx tsc --noEmit
+      - run: bun run build
+  windows-test:
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: '"AMPLY_RELEASE_DIR=$env:RUNNER_TEMP\amply-ha-test" >> $env:GITHUB_ENV'
+      - run: bun run package:win
+      - name: Install packaged-app test driver
+        run: npm install --prefix "$env:RUNNER_TEMP\amply-e2e" playwright@1.62.1 --ignore-scripts --no-audit --no-fund
+      - name: Existing native playback regression
+        env:
+          AMPLY_PLAYWRIGHT_PATH: ${{ runner.temp }}\amply-e2e\node_modules\playwright
+        run: node scripts/smoke-desktop.cjs "$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64\Ampli Player.exe"
+      - name: Test encrypted Home Assistant connection against actual Windows player
+        env:
+          AMPLY_PLAYWRIGHT_PATH: ${{ runner.temp }}\amply-e2e\node_modules\playwright
+          AMPLY_BRIDGE_EVIDENCE: ${{ runner.temp }}\amply-ha-test\evidence
+        run: node scripts/smoke-home-assistant.cjs "$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64\Ampli Player.exe"
+      - name: Package portable test build without publishing a release
+        run: |
+          Compress-Archive -Path "$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64\*" -DestinationPath "$env:AMPLY_RELEASE_DIR\AmPly-HomeAssistant-Test-win-x64.zip"
+          $hash = (Get-FileHash -Algorithm SHA256 "$env:AMPLY_RELEASE_DIR\AmPly-HomeAssistant-Test-win-x64.zip").Hash.ToLower()
+          "$hash  AmPly-HomeAssistant-Test-win-x64.zip" | Set-Content -Encoding ascii "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: amply-home-assistant-windows-test
+          path: |
+            ${{ env.AMPLY_RELEASE_DIR }}\AmPly-HomeAssistant-Test-win-x64.zip
+            ${{ env.AMPLY_RELEASE_DIR }}\SHA256SUMS.txt
+            ${{ env.AMPLY_RELEASE_DIR }}\evidence\
+          retention-days: 14

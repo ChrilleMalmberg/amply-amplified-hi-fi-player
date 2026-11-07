@@ -3,9 +3,9 @@ import { PlayerContext, usePlayer, type PlayerApi, type Track } from "./player-c
 
 const CHANNEL = "amply-desktop-player-v1";
 type Message = { type: string; id?: string; method?: string; args?: unknown[]; state?: Partial<PlayerApi>; tracks?: Track[]; result?: unknown; error?: string };
-const METHODS = ["ensureGraph", "addFiles", "playAt", "loadItems", "appendItems", "playItems", "saveAs", "play", "pause", "stop", "next", "prev", "seek", "setVolume", "setBalance", "setBalanceEnabled", "toggleShuffle", "toggleRepeat", "setRepeatMode", "toggleStopAfter", "cycleAB", "fadeStop", "seekBy", "volumeBy", "setEqOn", "resetEq", "setEqBand", "setEqPreamp", "applyEqPreset"] as const;
+const METHODS = ["ensureGraph", "addFiles", "playAt", "loadItems", "appendItems", "playItems", "saveAs", "play", "pause", "pauseOnly", "stop", "next", "prev", "seek", "setVolume", "setMuted", "setBalance", "setBalanceEnabled", "toggleShuffle", "toggleRepeat", "setRepeatMode", "toggleStopAfter", "cycleAB", "fadeStop", "seekBy", "volumeBy", "setEqOn", "resetEq", "setEqBand", "setEqPreamp", "applyEqPreset"] as const;
 function stateOf(p: PlayerApi): Partial<PlayerApi> {
-  return { current:p.current,playing:p.playing,paused:p.paused,time:p.time,volume:p.volume,balance:p.balance,balanceEnabled:p.balanceEnabled,audioCapabilities:p.audioCapabilities,shuffle:p.shuffle,repeat:p.repeat,repeatMode:p.repeatMode,stopAfter:p.stopAfter,ab:p.ab,sampleRate:p.sampleRate,skipped:p.skipped,duration:p.duration,eq:p.eq,eqPresetName:p.eqPresetName };
+  return { current:p.current,playing:p.playing,paused:p.paused,time:p.time,volume:p.volume,muted:p.muted,balance:p.balance,balanceEnabled:p.balanceEnabled,audioCapabilities:p.audioCapabilities,shuffle:p.shuffle,repeat:p.repeat,repeatMode:p.repeatMode,stopAfter:p.stopAfter,ab:p.ab,sampleRate:p.sampleRate,skipped:p.skipped,duration:p.duration,eq:p.eq,eqPresetName:p.eqPresetName };
 }
 export function PlayerBroadcaster() {
   const p=usePlayer(); const latest=useRef(p); latest.current=p;

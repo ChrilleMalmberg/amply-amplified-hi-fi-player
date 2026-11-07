@@ -16,9 +16,10 @@ type MenuBarProps = {
   onTogglePL?: () => void;
   onToggleEQ?: () => void;
   onTop?: { value: boolean; set: (v: boolean) => void };
+  onHomeAssistant?: () => void;
 };
 
-export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit, onTogglePL, onToggleEQ, onTop }: MenuBarProps) {
+export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit, onTogglePL, onToggleEQ, onTop, onHomeAssistant }: MenuBarProps) {
   const p = usePlayer();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
@@ -127,6 +128,7 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
       </>)}
       {menu("settings", "Options", <>
         {item("Audio plug-ins / Advanced EQ", onOpenPlugins)}
+        {onHomeAssistant && item("Home Assistant connection…", onHomeAssistant)}
         {onTop && check(onTop.value, "Always on top", () => onTop.set(!onTop.value))}
       </>)}
       {menu("help", "Help", <>

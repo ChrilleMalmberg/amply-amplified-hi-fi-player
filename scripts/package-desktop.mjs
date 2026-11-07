@@ -12,9 +12,11 @@ try {
   await mkdir(path.join(stage, "electron"));
   await mkdir(path.join(stage, "dist-electron"));
   await cp(path.join(root, "dist-electron/client"), path.join(stage, "dist-electron/client"), { recursive: true });
-  for (const file of ["main.cjs", "preload.cjs", "window-layout.cjs", "icon.ico"]) {
+  for (const file of ["main.cjs", "preload.cjs", "window-layout.cjs", "home-assistant-server.cjs", "home-assistant-controller.cjs", "icon.ico"]) {
     await cp(path.join(root, "electron", file), path.join(stage, "electron", file));
   }
+  await mkdir(path.join(stage, 'node_modules'), { recursive: true });
+  await cp(path.join(root, 'node_modules/node-forge'), path.join(stage, 'node_modules/node-forge'), { recursive: true });
   const pointerPath = path.join(root, "src/assets/amply-official-startup.jpg.asset.json");
   const logo = JSON.parse(await readFile(pointerPath, "utf8"));
   const logoPath = path.join(stage, "dist-electron/client", logo.url.replace(/^\//, ""));

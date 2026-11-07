@@ -1,9 +1,28 @@
 // Independent Winamp-style desktop panels, sharing one audio owner.
-const { app, BrowserWindow, Menu, shell, ipcMain, screen, dialog } = require("electron");
+const { app, BrowserWindow, Menu, shell, ipcMain, screen, dialog, safeStorage } = require("electron");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const layout = require("./window-layout.cjs");
+const { HomeAssistantController } = require("./home-assistant-controller.cjs");
+const { randomUUID } = require("node:crypto");
+let homeAssistant = null;
+const remoteRequests = new Map();
+function cancelRemoteRequests() {
+  homeAssistant?.invalidateState();
+  for (const request of remoteRequests.values()) { clearTimeout(request.timer); request.reject(Error('Player disconnected')); }
+  remoteRequests.clear();
+}
+function executeRemote(command) {
+  return new Promise((resolve, reject) => {
+    const main = windows.get('main')?.win;
+    if (!main || main.isDestroyed() || remoteRequests.size >= 16) { reject(Error('Player unavailable')); return; }
+    const id = randomUUID();
+    const timer = setTimeout(() => { remoteRequests.delete(id); reject(Error('Player did not respond')); }, 4000);
+    remoteRequests.set(id, { resolve, reject, timer });
+    main.webContents.send('amply:ha-command', { id, command });
+  });
+}
 
 const ROOT = path.join(__dirname, "..", "dist-electron", "client");
 const ORIGIN = "http://127.0.0.1:47823";
@@ -41,8 +60,8 @@ function startServer() {
 const windows = new Map();
 let saved = { windows: {}, detached: [] };
 let started = false, quitting = false, gesture = null, saveTimer;
-const sizes = { main: [550, 220], pl: [550, 300], eq: [550, 260], library: [680, 640], plugins: [760, 740] };
-const titles = { main: "AmPly HiFi Player V-3.1", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
+const sizes = { main: [550, 220], pl: [550, 300], eq: [550, 260], library: [680, 640], plugins: [760, 740], connection: [620, 620] };
+const titles = { main: `AmPly HiFi Player ${app.getVersion()}`, pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ", connection: "AmPly Home Assistant connection" };
 function dataPath() { return path.join(app.getPath("userData"), "desktop-windows.json"); }
 function rects() {
   return [...windows.values()].filter(p => !p.win.isDestroyed() && p.win.isVisible()).map(p => {
@@ -92,6 +111,10 @@ function makeWindow(id,kind,source="",startup=false) {
     webPreferences:{preload:path.join(__dirname,"preload.cjs"),sandbox:true,contextIsolation:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:"no-user-gesture-required"},
   });
   const p={id,kind,source,win,shaded:false,fullHeight:rect.h};windows.set(id,p);if(saved.onTop)win.setAlwaysOnTop(true);
+  if (kind === 'main') {
+    win.webContents.on('render-process-gone', cancelRemoteRequests);
+    win.webContents.on('did-start-loading', cancelRemoteRequests);
+  }
   win.webContents.setWindowOpenHandler(({ url: u }) => {
     if (/^https:\/\//.test(u)) void shell.openExternal(u);return {action:"deny"};
   });
@@ -124,6 +147,22 @@ function sender(event) {
 }
 function endGesture() {if(gesture){clearInterval(gesture.timer);gesture=null;states();}}
 ipcMain.handle("amply:info",event=>{const p=sender(event);if(!p)throw Error("Unknown desktop window");return {id:p.id,kind:p.kind,source:p.source};});
+ipcMain.handle('amply:ha-settings', async (event, action, options) => {
+  const p = sender(event);
+  if (!p || !['main', 'connection'].includes(p.kind) || !homeAssistant) throw Error('Connection settings are unavailable in this window.');
+  if (!['status', 'enable', 'disable', 'pairing', 'rotate'].includes(action)) throw Error('Invalid connection action.');
+  const result = await homeAssistant.configure(action, options && typeof options === 'object' ? options : {});
+  if (action === 'disable') cancelRemoteRequests();
+  return result;
+});
+ipcMain.on('amply:ha-state', (event, state) => { if (sender(event)?.kind === 'main') homeAssistant?.updateState(state); });
+ipcMain.on('amply:ha-result', (event, result) => {
+  if (sender(event)?.kind !== 'main' || !result || typeof result.id !== 'string') return;
+  const request = remoteRequests.get(result.id);
+  if (!request) return;
+  clearTimeout(request.timer); remoteRequests.delete(result.id);
+  if (result.ok === true) request.resolve(); else request.reject(Error('Player rejected command'));
+});
 ipcMain.on("amply:gesture",(event,m)=>{
   const p=sender(event);if(!p || !m || !["move","resize","end"].includes(m.action))return;
   if(m.action==="end"){if(gesture?.id===p.id)endGesture();return;}
@@ -171,7 +210,7 @@ ipcMain.on("amply:control",(event,m)=>{
   else if(["open","toggle"].includes(m.action)&&typeof m.value==="string"&&m.value.length<300){
     const value=m.value;
     if(value.startsWith("source:")){const source=value.slice(7);makeWindow(`source-${Date.now()}`,"library",source);}
-    else if(["pl","eq","library","plugins"].includes(value)){
+    else if(["pl","eq","library","plugins","connection"].includes(value)){
       const target=windows.get(value);
       if(m.action==="toggle"&&target?.win.isVisible()){target.win.hide();remember(target);states();}else makeWindow(value,value);
     }
@@ -191,6 +230,9 @@ app.setAppUserModelId("HiFi.AmpliPlayer");
 if (!app.requestSingleInstanceLock()) app.quit();
 else app.whenReady().then(async()=>{
   Menu.setApplicationMenu(null);
+  homeAssistant = new HomeAssistantController({ directory: app.getPath('userData'), encryption: safeStorage,
+    execute: executeRemote, version: app.getVersion() });
+  await homeAssistant.start();
   try {
     const raw=JSON.parse(fs.readFileSync(dataPath(),"utf8"));
     if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string"),onTop:raw.onTop===true};
@@ -200,5 +242,5 @@ else app.whenReady().then(async()=>{
   screen.on("display-removed",recover);screen.on("display-metrics-changed",recover);
 });
 app.on("second-instance",()=>{const main=windows.get("main")?.win;if(main){if(main.isMinimized())main.restore();main.show();main.focus();}});
-app.on("before-quit",()=>{quitting=true;endGesture();clearTimeout(saveTimer);try{fs.writeFileSync(dataPath(),JSON.stringify(saved));}catch{/* no disk */}});
+app.on("before-quit",()=>{quitting=true;endGesture();clearTimeout(saveTimer);cancelRemoteRequests();void homeAssistant?.close();try{fs.writeFileSync(dataPath(),JSON.stringify(saved));}catch{/* no disk */}});
 app.on("window-all-closed", () => app.quit());
