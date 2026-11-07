@@ -14,6 +14,8 @@ import { useMusicLibrary } from "./use-music-library";
 import { PlayerBroadcaster } from "./RemotePlayer";
 import { usePlayer } from "./player-context";
 import { PLAYER_SKINS, savePlayerSkin } from "@/lib/player-skins";
+import { HomeAssistantPlayer } from './HomeAssistantPlayer';
+import { HomeAssistantSettings } from './HomeAssistantSettings';
 
 function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:string;children:ReactNode;controls?:ReactNode}) {
   const [state,setState]=useState<NativeWindowState>({detached:false,grouped:false});
@@ -69,7 +71,7 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
     const up=()=>bridge?.gesture("end");window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up);window.addEventListener("blur",up);
     return()=>{window.removeEventListener("pointerup",up);window.removeEventListener("pointercancel",up);window.removeEventListener("blur",up);};
   },[bridge]);
-  const title=panel.kind==="main"?"AMPLY · HIFI PLAYER":panel.kind==="pl"?"PLAYLIST":panel.kind==="eq"?"EQUALIZER":panel.kind==="plugins"?"ADVANCED EQ · AUDIO PLUG-INS":panel.source?`SOURCE · ${panel.source}`:"MUSIC LIBRARY";
+  const title=panel.kind==="main"?"AMPLY · HIFI PLAYER":panel.kind==="pl"?"PLAYLIST":panel.kind==="eq"?"EQUALIZER":panel.kind==="plugins"?"ADVANCED EQ · AUDIO PLUG-INS":panel.kind==="connection"?"HOME ASSISTANT CONNECTION":panel.source?`SOURCE · ${panel.source}`:"MUSIC LIBRARY";
   const controls=panel.kind==="main"?<>
     <Button variant="retro" size="retro" className="wa-tbtn" title="Audio plug-ins" aria-label="Open plug-in settings" onClick={()=>bridge?.control("open","plugins")}><Plug/></Button>
     <Button variant="retro" size="retro" className="wa-tbtn" title="Music library" aria-label="Open music library" onClick={()=>bridge?.control("open","library")}><Library/></Button>
@@ -83,7 +85,7 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
       event.preventDefault();bridge?.gesture("end");
       setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-164)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-198))});
     }}>
-    {panel.kind==="main" && <PlayerBroadcaster/>}
+    {panel.kind==="main" && <><PlayerBroadcaster/><HomeAssistantPlayer ready={!intro}/></>}
     {!intro && <WinampCommands onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onOpenLibrary={()=>bridge?.control("open","library")}/>}
     {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={controls}>
       {panel.kind==="main"?<>
@@ -91,9 +93,10 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
           onOpenLibrary={()=>bridge?.control("open","library")} onOpenPlugins={()=>bridge?.control("open","plugins")}
           onCompact={()=>{setMode("small");bridge?.control("compact");}} onFull={()=>{setMode("large");bridge?.control("full");}}
           onArrange={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")}
-          onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onTop={{value:onTop,set:setOnTop}}/>
+          onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onTop={{value:onTop,set:setOnTop}}
+          onHomeAssistant={()=>bridge?.control("open","connection")}/>
         <MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>
-      </>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
+      </>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:panel.kind==="connection"?<HomeAssistantSettings/>:<NativeLibrary panel={panel}/>}
     </NativeFrame>}
     {menu && <div className="wa-menu wa-native-skin-menu" role="menu" aria-label="Skins" style={{left:menu.x,top:menu.y}} onPointerDown={event=>event.stopPropagation()}>
       <div className="wa-menu-head">Skins</div>

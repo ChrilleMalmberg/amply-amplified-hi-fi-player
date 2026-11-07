@@ -66,6 +66,7 @@ function usePlayerState() {
   const [paused, setPaused] = useState(false);
   const [time, setTime] = useState(0);
   const [volume, setVolumeS] = useState(0.8);
+  const [muted, setMutedS] = useState(false);
   const volumeRef = useRef(volume);
   volumeRef.current = volume;
   const [balance, setBalanceS] = useState(0);
@@ -414,6 +415,7 @@ function usePlayerState() {
     paused,
     time,
     volume,
+    muted,
     balance,
     balanceEnabled,
     audioCapabilities,
@@ -439,7 +441,7 @@ function usePlayerState() {
         return;
       }
       ensureGraph();
-      if (!playing) el.currentTime = 0;
+      if (!playing && el.paused) el.currentTime = 0;
       void el.play();
     },
     pause: () => {
@@ -448,6 +450,11 @@ function usePlayerState() {
       cancelFade();
       if (el.paused) void el.play();
       else el.pause();
+    },
+    pauseOnly: () => {
+      cancelFade();
+      const el = a();
+      if (el && !el.paused) el.pause();
     },
     stop: () => resetPlayback(),
     next: () => {
@@ -468,6 +475,11 @@ function usePlayerState() {
       setVolumeS(c);
       const el = a();
       if (el) el.volume = c;
+    },
+    setMuted: (value: boolean) => {
+      const el = a();
+      if (el) el.muted = value;
+      setMutedS(value);
     },
     setBalance: (b: number) => {
       saveBalance(balanceEnabled, b);

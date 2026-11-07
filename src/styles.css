@@ -1,6 +1,16 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+
+.wa-ha-settings { padding: 16px; color: var(--wa-lcd-text); font-size: 14px; height: calc(100vh - 32px); overflow: auto; }
+.wa-ha-settings h2 { font-size: 18px; margin: 0 0 12px; }
+.wa-ha-settings h3 { font-size: 16px; margin: 16px 0 8px; }
+.wa-ha-settings p { margin: 10px 0; line-height: 1.5; }
+.wa-ha-settings label { display: block; margin: 10px 0; }
+.wa-ha-settings .wa-dialog-input { display: block; width: 100%; margin-top: 5px; }
+.wa-ha-settings dd { margin: 4px 0 12px; overflow-wrap: anywhere; }
+.wa-ha-settings button { min-height: 34px; }
+.wa-ha-note { opacity: .85; }
 @import "@fontsource/vt323";
 @import "@fontsource/silkscreen";
 
