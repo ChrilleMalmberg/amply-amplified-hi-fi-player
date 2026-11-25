@@ -7,6 +7,7 @@ type Workspace = {
   update: (windows: WindowRect[]) => void;
   detach: (id: string, detached: boolean) => void;
   reset: () => void;
+  resetVersion: number;
 };
 const Context = createContext<Workspace | null>(null);
 export function useWindowWorkspace() { return useContext(Context); }
@@ -15,6 +16,7 @@ export function WindowWorkspace({ children }: { children: ReactNode }) {
   const [layout, setLayout] = useState<Record<string, WindowRect>>({});
   const [detached, setDetached] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
+  const [resetVersion, setResetVersion] = useState(0);
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("amply-window-layout") || "null");
@@ -34,9 +36,9 @@ export function WindowWorkspace({ children }: { children: ReactNode }) {
     if (!ready) return;
     try { localStorage.setItem("amply-window-layout", JSON.stringify({ layout, detached })); } catch { /* offline storage unavailable */ }
   }, [layout, detached, ready]);
-  return <Context.Provider value={{ layout, detached,
+  return <Context.Provider value={{ layout, detached, resetVersion,
     update: windows => setLayout(old => ({ ...old, ...Object.fromEntries(windows.map(w => [w.id, w])) })),
     detach: (id, off) => setDetached(old => off ? [...new Set([...old, id])] : old.filter(item => item !== id)),
-    reset: () => { setLayout({}); setDetached([]); },
+    reset: () => { setLayout({}); setDetached([]); setResetVersion(v => v + 1); },
   }}>{children}</Context.Provider>;
 }

@@ -3,6 +3,8 @@ import { usePlayer } from "./player-context";
 import { PlaylistManager } from "./PlaylistManager";
 import { PLAYER_SKINS } from "@/lib/player-skins";
 import { openDialog, toggleTimeDisplay } from "./WinampCommands";
+import { Button } from "@/components/ui/button";
+import type { PlayerInterface } from "@/lib/player-interface";
 
 type MenuBarProps = {
   skin: string;
@@ -16,9 +18,12 @@ type MenuBarProps = {
   onTogglePL?: () => void;
   onToggleEQ?: () => void;
   onTop?: { value: boolean; set: (v: boolean) => void };
+  skins?: readonly string[];
+  interfaceMode?: PlayerInterface;
+  onInterface?: (value: PlayerInterface) => void;
 };
 
-export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit, onTogglePL, onToggleEQ, onTop }: MenuBarProps) {
+export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact, onFull, onArrange, onExit, onTogglePL, onToggleEQ, onTop, skins = PLAYER_SKINS, interfaceMode, onInterface }: MenuBarProps) {
   const p = usePlayer();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
@@ -113,16 +118,20 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
         {item("Clear playlist", () => { p.stop(); p.setTracks([]); })}
       </>)}
       {menu("view", "View", <>
+        {onInterface && <><div className="wa-menu-head">Interface</div>
+          {check(interfaceMode === "unified", "Unified player", () => onInterface("unified"))}
+          {check(interfaceMode === "classic", "Classic Winamp", () => onInterface("classic"))}
+          <div className="wa-menu-sep" /></>}
         {item("Elapsed / remaining time  (Ctrl+T)", toggleTimeDisplay)}
         {onToggleEQ && item("Show / hide equalizer  (Alt+G)", onToggleEQ)}
         {item("Compact player", onCompact)}
         {item("Full player", onFull)}
         {item("Reset windows", onArrange)}
         <div className="wa-menu-head">Skins</div>
-        {PLAYER_SKINS.map((s) => (
-          <button key={s} className="wa-menu-item" role="menuitemradio" aria-checked={skin === s} onClick={() => onSkin(s)}>
+        {skins.map((s) => (
+          <Button variant="retro" size="retro" key={s} className="wa-menu-item" role="menuitemradio" aria-checked={skin === s} onClick={() => { onSkin(s); setOpen(null); }}>
             {skin === s ? "✓ " : "  "}{s}
-          </button>
+          </Button>
         ))}
       </>)}
       {menu("settings", "Options", <>

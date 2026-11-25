@@ -17,8 +17,8 @@ function resize(windows, dx, dy) {
   if(!windows.length) return [];
   const x=Math.min(...windows.map(w=>w.x)), y=Math.min(...windows.map(w=>w.y));
   const width=Math.max(...windows.map(w=>w.x+w.w))-x, height=Math.max(...windows.map(w=>w.y+w.h))-y;
-  const sx=Math.max((width+dx)/width,...windows.map(w=>(w.minW||320)/w.w));
-  const sy=Math.max((height+dy)/height,...windows.map(w=>(w.minH||140)/w.h));
+  const sx=dx===0?1:Math.max((width+dx)/width,...windows.map(w=>(w.minW||320)/w.w));
+  const sy=dy===0?1:Math.max((height+dy)/height,...windows.map(w=>(w.minH||140)/w.h));
   return windows.map(w=>{const nx=Math.round(x+(w.x-x)*sx),ny=Math.round(y+(w.y-y)*sy);return {...w,x:nx,y:ny,w:Math.round(x+(w.x+w.w-x)*sx)-nx,h:Math.round(y+(w.y+w.h-y)*sy)-ny};});
 }
 function snap(windows, others, tolerance=12) {
@@ -46,4 +46,9 @@ function toBounds(rect) {
   const result={x:Math.round(rect.x),y:Math.round(rect.y),width:Math.round(rect.w),height:Math.round(rect.h)};
   return Object.values(result).every(n=>n>=-2147483648 && n<=2147483647) ? result : null;
 }
-module.exports={touching,connected,move,resize,snap,restore,maximize,toBounds};
+function resetLayout(area, unified=false) {
+  const x=area.x+24,y=area.y+24;
+  if(unified)return [{id:"main",x,y,w:Math.max(320,Math.min(1000,area.width-48)),h:Math.max(180,Math.min(780,area.height-48))}];
+  return [{id:"main",x,y,w:550,h:220},{id:"pl",x,y:y+220,w:550,h:300},{id:"eq",x,y:y+520,w:550,h:260},{id:"library",x:x+570,y,w:680,h:640}];
+}
+module.exports={touching,connected,move,resize,snap,restore,maximize,toBounds,resetLayout};

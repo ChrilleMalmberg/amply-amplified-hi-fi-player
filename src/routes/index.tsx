@@ -19,6 +19,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "AmPly — Amplified Hi-Fi Player" },
       { property: "og:description", content: "Download AmPly v3.1 for Windows, explore the skins and get started with offline music playback." },
       { property: "og:image", content: "https://amply.win/marketing/img/amply-logo.jpg" },
+      { name: "twitter:image", content: "https://amply.win/marketing/img/amply-logo.jpg" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

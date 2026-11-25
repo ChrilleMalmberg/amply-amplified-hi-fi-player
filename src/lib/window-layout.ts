@@ -47,8 +47,8 @@ export function moveWindows(windows: WindowRect[], dx: number, dy: number): Wind
 export function resizeWindows(windows: WindowRect[], dx: number, dy: number): WindowRect[] {
   const group = bounds(windows);
   if (!group.w || !group.h) return windows;
-  const sx = Math.max((group.w + dx) / group.w, ...windows.map(w => (w.minW ?? 320) / w.w));
-  const sy = Math.max((group.h + dy) / group.h, ...windows.map(w => (w.minH ?? 140) / w.h));
+  const sx = dx === 0 ? 1 : Math.max((group.w + dx) / group.w, ...windows.map(w => (w.minW ?? 320) / w.w));
+  const sy = dy === 0 ? 1 : Math.max((group.h + dy) / group.h, ...windows.map(w => (w.minH ?? 140) / w.h));
   return windows.map(w => {
     const x = Math.round(group.x + (w.x - group.x) * sx);
     const y = Math.round(group.y + (w.y - group.y) * sy);

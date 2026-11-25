@@ -4,8 +4,8 @@ import { Desktop } from "@/components/winamp/Desktop";
 export const Route = createFileRoute("/player")({
   head: () => ({
     meta: [
-      { title: "AmPly HiFi Player V-3.1 — audiophile music player" },
-      { name: "description", content: "Play your own lossless music with a 10-band equalizer in a classic retro player." },
+      { title: "AmPly HiFi Player — Unified & Classic" },
+      { name: "description", content: "Play your music with a 10-band equalizer, three unified skins, or classic independent player windows." },
       { property: "og:title", content: "AmPly HiFi Player V-3.1" },
       { property: "og:description", content: "Audiophile playback of your own music files with a classic look." },
       { property: "og:type", content: "website" },

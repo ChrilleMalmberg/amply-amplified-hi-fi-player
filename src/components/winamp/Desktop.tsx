@@ -18,6 +18,8 @@ import { RemotePlayerProvider } from "./RemotePlayer";
 import { PLAYER_SKINS } from "@/lib/player-skins";
 import { MenuBar } from "./MenuBar";
 import { WinampCommands } from "./WinampCommands";
+import { UnifiedPlayer } from "./UnifiedPlayer";
+import { usePlayerInterface, UNIFIED_SKINS } from "@/lib/player-interface";
 
 type Pos = { x: number; y: number };
 const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 8 }, eq: { x: 8, y: 528 }, plugins: { x: 32, y: 80 } };
@@ -25,7 +27,8 @@ const DEFAULT = { main: { x: 8, y: 8 }, pl: { x: 8, y: 228 }, vis: { x: 600, y: 
 function Shell() {
   const p = usePlayer();
   const workspace = useWindowWorkspace();
-  const arrange = () => { workspace?.reset(); setPos(DEFAULT); };
+  const arrange = () => { workspace?.reset(); setPos(DEFAULT); setShow({ pl: true, vis: true, eq: true }); setBrowsers([{ id: "library", source: "" }]); setMode("large"); };
+  const [interfaceMode, setInterfaceMode] = usePlayerInterface();
   const [intro, setIntro] = useState(true);
   const [skin, setSkin] = useState<string>("silver");
   const [pos, setPos] = useState<Record<string, Pos>>(DEFAULT);
@@ -58,6 +61,14 @@ function Shell() {
   }, [pos, skin, show]);
 
   const mv = (id: string) => (np: Pos) => setPos((s) => ({ ...s, [id]: np }));
+  useEffect(() => { window.addEventListener("amply:reset-windows", arrange); return () => window.removeEventListener("amply:reset-windows", arrange); });
+
+  if (interfaceMode === "unified") return <div className="wa-desktop wa-unified" data-skin={UNIFIED_SKINS.some(s => s === skin) ? skin : "silver"}>
+    {intro && <IntroSplash onDone={() => { p.ensureGraph(); setIntro(false); }} />}
+    <WaWindow id="unified" title="AmPly · Hi-Fi Player" width={1000} height={780} pos={{ x: 8, y: 8 }} onMove={mv("unified")}>
+      {!intro && <UnifiedPlayer skin={UNIFIED_SKINS.some(s => s === skin) ? skin : "silver"} onSkin={setSkin} onInterface={setInterfaceMode} onReset={arrange} onExit={() => window.close()} />}
+    </WaWindow>
+  </div>;
 
   return (
     <div className="wa-desktop" data-skin={skin} data-mode={mode} onClick={() => setMenu(null)}>
@@ -73,7 +84,7 @@ function Shell() {
           <Button variant="retro" size="retro" className="wa-tbtn" aria-label="Arrange windows" title="Arrange windows" onClick={arrange}><Columns2 /></Button>
         </>}
         onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); }}>
-        <MenuBar skin={skin} onSkin={setSkin}
+        <MenuBar skin={skin} onSkin={setSkin} interfaceMode="classic" onInterface={setInterfaceMode}
           onOpenLibrary={() => { setMode("large"); if (!browsers.length) setBrowsers([{ id: "library", source: "" }]); }}
           onOpenPlugins={() => { setMode("large"); setShowPlugins(true); }}
           onCompact={() => setMode("small")} onFull={() => setMode("large")}

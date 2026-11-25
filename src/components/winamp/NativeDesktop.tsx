@@ -13,21 +13,25 @@ import { WinampCommands } from "./WinampCommands";
 import { useMusicLibrary } from "./use-music-library";
 import { PlayerBroadcaster } from "./RemotePlayer";
 import { usePlayer } from "./player-context";
-import { PLAYER_SKINS, savePlayerSkin } from "@/lib/player-skins";
+import { savePlayerSkin } from "@/lib/player-skins";
+
+import { UnifiedPlayer } from "./UnifiedPlayer";
+import { WindowMenu } from "./WindowMenu";
+import { usePlayerInterface, UNIFIED_SKINS, type PlayerInterface } from "@/lib/player-interface";
 
 function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:string;children:ReactNode;controls?:ReactNode}) {
   const [state,setState]=useState<NativeWindowState>({detached:false,grouped:false});
   const [shaded,setShaded]=useState(false);
   const bridge=desktopBridge();
-  useEffect(()=>bridge?.onWindowState(setState),[bridge]);
+  useEffect(()=>bridge?.onWindowState(value=>{setState(value);setShaded(value.shaded ?? false);}),[bridge]);
   const gesture=(event:React.PointerEvent,action:"move"|"resize",axis:"both"|"x"|"y"="both")=>{
-    if(event.button!==0)return;
+    if(event.button!==0 || event.detail>1)return;
     if(action==="move" && (event.target as HTMLElement).closest("button"))return;
     event.preventDefault();bridge?.gesture(action,axis);
   };
   const shade=()=>{setShaded(v=>!v);bridge?.control("shade");};
   return <div className="wa-window wa-native-window" data-wa-win={panel.id} data-grouped={state.grouped} data-shaded={shaded}>
-    <div className="wa-titlebar" onPointerDown={e=>gesture(e,"move")} onDoubleClick={shade}>
+    <div className="wa-titlebar" onPointerDown={e=>gesture(e,"move")} onDoubleClick={e=>{if(!(e.target as HTMLElement).closest("button"))bridge?.control("maximize");}}>
       <span className="wa-title-text">{title}</span><span className="wa-title-stripes"/><span className="wa-title-controls">{controls}
       <Button variant="retro" size="retro" className="wa-tbtn" title={state.detached?"Join snapped windows":"Detach window"} aria-label={`${state.detached?"Join":"Detach"} ${title}`} aria-pressed={!state.detached} onClick={()=>bridge?.control("detach",!state.detached)}>{state.detached?<Unlink/>:<Link2/>}</Button>
       <Button variant="retro" size="retro" className="wa-tbtn" aria-label={`Shade ${title}`} title="Collapse to title bar" onClick={shade}><ChevronUp/></Button>
@@ -47,13 +51,17 @@ function NativeLibrary({panel}:{panel:NativePanel}) {
   return <LibraryWindow library={library} initialSource={panel.source} onNewWindow={source=>desktopBridge()?.control("open",`source:${source}`)}/>;
 }
 export function NativeDesktop({panel}:{panel:NativePanel}) {
+  const [interfaceMode, setInterfaceMode] = usePlayerInterface();
+  const switchInterface = (value: PlayerInterface) => { setInterfaceMode(value); desktopBridge()?.control("interface", value); };
   const p=usePlayer(); const [intro,setIntro]=useState(panel.kind==="main");
   const [skin,setSkin]=useState("silver");const [mode,setMode]=useState("large");
   const [menu,setMenu]=useState<{x:number;y:number}|null>(null);
   const [onTop,setOnTopS]=useState(false);
+  const [windowState,setWindowState]=useState<NativeWindowState>({detached:false,grouped:false});
   useEffect(()=>{try{setOnTopS(localStorage.getItem("amply-ontop")==="1");}catch{/* default */}},[]);
   const setOnTop=(v:boolean)=>{setOnTopS(v);try{localStorage.setItem("amply-ontop",v?"1":"0");}catch{/* storage unavailable */}desktopBridge()?.control("ontop",v);};
   const bridge=desktopBridge();
+  useEffect(()=>bridge?.onWindowState(setWindowState),[bridge]);
   useEffect(()=>{
     if(!menu)return;
     const close=()=>setMenu(null);
@@ -77,17 +85,19 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
     <Button variant="retro" size="retro" className="wa-tbtn" title="Full player" aria-label="Full player" onClick={()=>{setMode("large");bridge?.control("full");}}><Maximize2/></Button>
     <Button variant="retro" size="retro" className="wa-tbtn" title="Arrange windows" aria-label="Arrange windows" onClick={()=>bridge?.control("arrange")}><Columns2/></Button>
   </>:undefined;
-  return <div className="wa-desktop wa-native-desktop" data-skin={skin} data-mode={mode}
+  const unified = panel.kind === "main" && interfaceMode === "unified";
+  const displaySkin = unified && !UNIFIED_SKINS.some(s=>s===skin) ? "silver" : skin;
+  return <div className={`wa-desktop wa-native-desktop ${unified ? "wa-unified" : ""}`} data-skin={displaySkin} data-mode={unified ? "large" : mode}
     onClick={()=>setMenu(null)} onContextMenu={event=>{
       if(intro || (event.target as HTMLElement).closest("input,textarea,select"))return;
       event.preventDefault();bridge?.gesture("end");
-      setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-164)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-198))});
+      setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-220)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-190))});
     }}>
     {panel.kind==="main" && <PlayerBroadcaster/>}
-    {!intro && <WinampCommands onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onOpenLibrary={()=>bridge?.control("open","library")}/>}
-    {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={controls}>
-      {panel.kind==="main"?<>
-        <MenuBar skin={skin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}}
+    {!intro && !unified && <WinampCommands onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onOpenLibrary={()=>bridge?.control("open","library")}/>}
+    {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={unified ? undefined : controls}>
+      {unified ? <UnifiedPlayer skin={displaySkin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}} onInterface={switchInterface} onReset={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")} /> : panel.kind==="main"?<>
+        <MenuBar interfaceMode="classic" onInterface={switchInterface} skin={skin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}}
           onOpenLibrary={()=>bridge?.control("open","library")} onOpenPlugins={()=>bridge?.control("open","plugins")}
           onCompact={()=>{setMode("small");bridge?.control("compact");}} onFull={()=>{setMode("large");bridge?.control("full");}}
           onArrange={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")}
@@ -95,12 +105,7 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
         <MainWindow onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")}/>
       </>:panel.kind==="pl"?<PlaylistWindow/>:panel.kind==="eq"?<EqualizerWindow onAdvanced={()=>bridge?.control("open","plugins")}/>:panel.kind==="plugins"?<PluginWindow/>:<NativeLibrary panel={panel}/>}
     </NativeFrame>}
-    {menu && <div className="wa-menu wa-native-skin-menu" role="menu" aria-label="Skins" style={{left:menu.x,top:menu.y}} onPointerDown={event=>event.stopPropagation()}>
-      <div className="wa-menu-head">Skins</div>
-      {PLAYER_SKINS.map(candidate=><Button key={candidate} variant="retro" size="retro" role="menuitemradio" aria-checked={skin===candidate} className="wa-menu-item" onClick={()=>{
-        savePlayerSkin(candidate,localStorage);setSkin(candidate);setMenu(null);
-      }}>{skin===candidate?"✓ ":"  "}{candidate}</Button>)}
-      <Button variant="retro" size="retro" role="menuitem" className="wa-menu-item" onClick={()=>bridge?.control("arrange")}>Reset windows</Button>
-    </div>}
+    {menu && <WindowMenu {...menu} onClose={()=>setMenu(null)} onMaximize={()=>bridge?.control("maximize")} onMinimize={()=>bridge?.control("minimize")} onReset={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")} detached={windowState.detached} onDetach={()=>bridge?.control("detach",!windowState.detached)} />}
+
   </div>;
 }

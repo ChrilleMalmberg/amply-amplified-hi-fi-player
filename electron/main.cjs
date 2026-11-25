@@ -39,7 +39,7 @@ function startServer() {
 }
 
 const windows = new Map();
-let saved = { windows: {}, detached: [] };
+let saved = { windows: {}, detached: [], interface: "unified" };
 let started = false, quitting = false, gesture = null, saveTimer;
 const sizes = { main: [550, 220], pl: [550, 300], eq: [550, 260], library: [680, 640], plugins: [760, 740] };
 const titles = { main: "AmPly HiFi Player V-3.1", pl: "AmPly Playlist", eq: "AmPly Equalizer", library: "AmPly Music Library", plugins: "AmPly Advanced EQ" };
@@ -63,7 +63,7 @@ function remember(p) {
 }
 function states() {
   const all=rects();
-  for(const p of windows.values()) if(!p.win.isDestroyed()) p.win.webContents.send("amply:window-state",{detached:saved.detached.includes(p.id),grouped:layout.connected(p.id,all,saved.detached).length>1});
+  for(const p of windows.values()) if(!p.win.isDestroyed()) p.win.webContents.send("amply:window-state",{detached:saved.detached.includes(p.id),grouped:layout.connected(p.id,all,saved.detached).length>1,shaded:p.shaded,maximized:p.maximized===true});
 }
 function apply(rectangles) {
   for(const r of rectangles) {
@@ -123,6 +123,20 @@ function sender(event) {
   return p;
 }
 function endGesture() {if(gesture){clearInterval(gesture.timer);gesture=null;states();}}
+function resetWindows() {
+  endGesture();saved.detached=[];
+  const main=windows.get("main");if(!main)return;
+  const area=screen.getDisplayMatching(main.win.getBounds()).workArea;
+  for(const p of windows.values()){p.shaded=false;p.maximized=false;p.restoreRects=null;}
+  const reset=layout.resetLayout(area,saved.interface==="unified");
+  for(const r of reset) {
+    const p=windows.get(r.id)||makeWindow(r.id,r.id);
+    p.win.show();if(p.win.isMinimized())p.win.restore();
+  }
+  if(saved.interface==="unified")for(const p of windows.values())if(p.id!=="main")p.win.hide();
+  else for(const p of windows.values())if(p.id.startsWith("source-")||p.id==="plugins")p.win.hide();
+  apply(reset);for(const p of windows.values())remember(p);states();
+}
 ipcMain.handle("amply:info",event=>{const p=sender(event);if(!p)throw Error("Unknown desktop window");return {id:p.id,kind:p.kind,source:p.source};});
 ipcMain.on("amply:gesture",(event,m)=>{
   const p=sender(event);if(!p || !m || !["move","resize","end"].includes(m.action))return;
@@ -135,6 +149,8 @@ ipcMain.on("amply:gesture",(event,m)=>{
   gesture={id:p.id,timer:setInterval(()=>{
     if(Date.now()-since>30000 || p.win.isDestroyed()){endGesture();return;}
     const cursor=screen.getCursorScreenPoint(),dx=cursor.x-start.x,dy=cursor.y-start.y;
+    if(Math.abs(dx)<2&&Math.abs(dy)<2)return;
+    p.maximized=false;p.restoreRects=null;
     let next=m.action==="move"?layout.move(group,dx,dy):layout.resize(group,m.axis==="y"?0:dx,m.axis==="x"?0:dy);
     if(m.action==="move"&&!saved.detached.includes(p.id))next=layout.snap(next,all.filter(r=>!group.some(g=>g.id===r.id)&&!saved.detached.includes(r.id)));
     apply(next);
@@ -143,15 +159,21 @@ ipcMain.on("amply:gesture",(event,m)=>{
 ipcMain.on("amply:control",(event,m)=>{
   const p=sender(event);if(!p || !m || typeof m.action!=="string")return;
   if(m.action==="ready" && p.kind==="main" && !started){
-    const mainRect=layout.restore(saved.windows.main,screen.getAllDisplays().map(d=>d.workArea))||defaultRect("main");
+    const mainRect=saved.interface==="unified"?layout.resetLayout(screen.getDisplayMatching(p.win.getBounds()).workArea,true)[0]:layout.restore(saved.windows.main,screen.getAllDisplays().map(d=>d.workArea))||defaultRect("main");
     started=true;apply([{...mainRect,id:"main"}]);
     const restore=Object.entries(saved.windows).filter(([id,r])=>id!=="main"&&r.visible&&["pl","eq","library","plugins"].includes(r.kind));
-    if(restore.length)for(const [id,r]of restore)makeWindow(id,r.kind,r.source);
-    else {makeWindow("pl","pl");makeWindow("eq","eq");makeWindow("library","library");}
+    if(saved.interface!=="unified"){
+      if(restore.length)for(const [id,r]of restore)makeWindow(id,r.kind,r.source);
+      else {makeWindow("pl","pl");makeWindow("eq","eq");makeWindow("library","library");}
+    }
+  }else if(m.action==="interface"&&p.kind==="main"&&["classic","unified"].includes(m.value)){
+    saved.interface=m.value;resetWindows();save();
   }else if(m.action==="close"){if(p.kind==="main")app.quit();else{p.win.hide();remember(p);states();}}
   else if(m.action==="minimize")p.win.minimize();
   else if(m.action==="ontop"&&typeof m.value==="boolean"){saved.onTop=m.value;for(const w of windows.values())w.win.setAlwaysOnTop(m.value);save();}
   else if(m.action==="maximize"){
+    endGesture();
+    if(p.shaded){p.shaded=false;p.win.setSize(p.win.getBounds().width,p.fullHeight);}
     const all=rects();
     const group=p.kind==="main"?layout.connected(p.id,all,saved.detached):all.filter(r=>r.id===p.id);
     if(!group.length)return;
@@ -167,7 +189,7 @@ ipcMain.on("amply:control",(event,m)=>{
     }
   }
   else if(m.action==="detach"&&typeof m.value==="boolean"){saved.detached=m.value?[...new Set([...saved.detached,p.id])]:saved.detached.filter(id=>id!==p.id);save();states();}
-  else if(m.action==="shade"){p.shaded=!p.shaded;if(p.shaded)p.fullHeight=p.win.getBounds().height;p.win.setSize(p.win.getBounds().width,p.shaded?26:p.fullHeight);remember(p);}
+  else if(m.action==="shade"){p.shaded=!p.shaded;if(p.shaded)p.fullHeight=p.win.getBounds().height;p.win.setSize(p.win.getBounds().width,p.shaded?26:p.fullHeight);remember(p);states();}
   else if(["open","toggle"].includes(m.action)&&typeof m.value==="string"&&m.value.length<300){
     const value=m.value;
     if(value.startsWith("source:")){const source=value.slice(7);makeWindow(`source-${Date.now()}`,"library",source);}
@@ -175,10 +197,8 @@ ipcMain.on("amply:control",(event,m)=>{
       const target=windows.get(value);
       if(m.action==="toggle"&&target?.win.isVisible()){target.win.hide();remember(target);states();}else makeWindow(value,value);
     }
-  }else if(m.action==="arrange"&&p.kind==="main"){
-    saved.detached=[];const a=screen.getDisplayMatching(p.win.getBounds()).workArea;const b=p.win.getBounds();
-    p.win.setBounds({x:a.x+32,y:a.y+32,width:b.width,height:b.height});
-    for(const other of windows.values())if(other.id!=="main"){const r=defaultRect(other.kind);apply([{...r,id:other.id}]);}remember(p);states();
+  }else if(m.action==="arrange"){
+    resetWindows();
   }else if(["compact","full"].includes(m.action)&&p.kind==="main"){
     const all=rects(),main=all.find(r=>r.id==="main");if(!main)return;
     const height=m.action==="compact"?90:220,delta=height-main.h;
@@ -193,7 +213,7 @@ else app.whenReady().then(async()=>{
   Menu.setApplicationMenu(null);
   try {
     const raw=JSON.parse(fs.readFileSync(dataPath(),"utf8"));
-    if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string"),onTop:raw.onTop===true};
+    if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string"),onTop:raw.onTop===true,interface:raw.interface==="classic"?"classic":"unified"};
   }catch{/* defaults */}
   try{await startServer();makeWindow("main","main","",true);}catch{dialog.showErrorBox("AmPly cannot start","The local player address is busy or unavailable. Close other copies of AmPly and try again.");app.quit();}
   const recover=()=>{endGesture();const areas=screen.getAllDisplays().map(d=>d.workArea);apply(rects().map(r=>layout.restore(r,areas)).filter(Boolean));};

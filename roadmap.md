@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Make unified player the default with three skins and a switch to classic windows
+- [x] Fix title-bar double-click maximize/restore, detached-window snapping and single-axis resizing, window context menu, and Reset Windows (browser and actual Linux Electron checks passed; Windows testing still needed)
 - [x] Fix native maximize error, right-align all panel title-bar controls, verify and deliver AmPly v3.4 Windows installer (native Linux maximize/restore verified; Windows execution awaits user test)
 - [x] Add Debian setup help to the website and repository documentation; deliver an updated Cloudflare ZIP
 - [x] Update amply.win footer and Debian download, verify layout, and deliver a fresh upload ZIP

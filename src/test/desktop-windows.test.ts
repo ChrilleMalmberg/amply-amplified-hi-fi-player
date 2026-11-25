@@ -4,6 +4,14 @@ const require=createRequire(import.meta.url);
 const native=require("../../electron/window-layout.cjs");
 const windows=[{id:"main",x:20,y:40,w:550,h:220},{id:"pl",x:20,y:260,w:550,h:300},{id:"eq",x:20,y:560,w:550,h:260},{id:"library",x:-1800,y:100,w:680,h:640}];
 describe("real desktop windows",()=>{
+  it("resets classic windows to original sizes and snapped edges",()=>{
+    const reset=native.resetLayout({x:0,y:0,width:1920,height:1080});
+    expect(reset.map((r:{id:string;w:number;h:number})=>[r.id,r.w,r.h])).toEqual([["main",550,220],["pl",550,300],["eq",550,260],["library",680,640]]);
+    expect(native.connected("main",reset).map((r:{id:string})=>r.id)).toEqual(["main","pl","eq"]);
+  });
+  it("horizontal resizing does not change height, even below normal minimum",()=>{
+    expect(native.resize([{id:"main",x:0,y:0,w:550,h:90}],50,0)[0]).toMatchObject({w:600,h:90});
+  });
   it("maximizes the connected player group using Electron workArea width and height",()=>{
     const result=native.maximize(native.connected("main",windows),{x:0,y:0,width:1100,height:1560});
     expect(result.map((r:unknown)=>native.toBounds(r))).toEqual([
