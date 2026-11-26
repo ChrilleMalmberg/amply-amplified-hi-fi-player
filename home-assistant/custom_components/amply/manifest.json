@@ -1,0 +1,12 @@
+{
+  "domain": "amply",
+  "name": "AmPly Windows",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/tree/main/home-assistant",
+  "issue_tracker": "https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/issues",
+  "codeowners": ["@ChrilleMalmberg"],
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "requirements": []
+}

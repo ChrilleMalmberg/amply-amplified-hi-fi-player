@@ -1,9 +1,11 @@
 // Independent Winamp-style desktop panels, sharing one audio owner.
-const { app, BrowserWindow, Menu, shell, ipcMain, screen, dialog } = require("electron");
+const { app, BrowserWindow, Menu, shell, ipcMain, screen, dialog, clipboard } = require("electron");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const layout = require("./window-layout.cjs");
+const { createController } = require("./home-assistant.cjs");
+let controller;
 
 const ROOT = path.join(__dirname, "..", "dist-electron", "client");
 const ORIGIN = "http://127.0.0.1:47823";
@@ -138,6 +140,17 @@ function resetWindows() {
   apply(reset);for(const p of windows.values())remember(p);states();
 }
 ipcMain.handle("amply:info",event=>{const p=sender(event);if(!p)throw Error("Unknown desktop window");return {id:p.id,kind:p.kind,source:p.source};});
+ipcMain.handle("amply:home-assistant", async (event, action) => {
+  if (sender(event)?.kind !== "main" || !controller) throw Error("Main player required");
+  if (action === "enable") await controller.enable();
+  else if (action === "disable") await controller.disable();
+  else if (action === "rotate") await controller.rotate();
+  else if (action === "copy-token") clipboard.writeText(controller.status().token);
+  else if (action !== "status") throw Error("Unknown controller action");
+  return controller.status();
+});
+ipcMain.on("amply:player-state", (event, data) => { if (sender(event)?.kind === "main" && started) controller?.update(data); });
+ipcMain.on("amply:player-result", (event, data) => { if (sender(event)?.kind === "main" && started) controller?.result(data); });
 ipcMain.on("amply:gesture",(event,m)=>{
   const p=sender(event);if(!p || !m || !["move","resize","end"].includes(m.action))return;
   if(m.action==="end"){if(gesture?.id===p.id)endGesture();return;}
@@ -211,6 +224,11 @@ app.setAppUserModelId("HiFi.AmpliPlayer");
 if (!app.requestSingleInstanceLock()) app.quit();
 else app.whenReady().then(async()=>{
   Menu.setApplicationMenu(null);
+  controller = createController({
+    configPath: path.join(app.getPath("userData"), "home-assistant.json"),
+    sendCommand: command => { const main = windows.get("main"); if (!started || !main || main.win.isDestroyed()) throw Error("Player unavailable"); main.win.webContents.send("amply:player-command", command); },
+  });
+  await controller.start();
   try {
     const raw=JSON.parse(fs.readFileSync(dataPath(),"utf8"));
     if(raw?.windows&&Array.isArray(raw.detached))saved={windows:raw.windows,detached:raw.detached.filter(id=>typeof id==="string"),onTop:raw.onTop===true,interface:raw.interface==="classic"?"classic":"unified"};

@@ -18,6 +18,7 @@ import { savePlayerSkin } from "@/lib/player-skins";
 import { UnifiedPlayer } from "./UnifiedPlayer";
 import { WindowMenu } from "./WindowMenu";
 import { usePlayerInterface, UNIFIED_SKINS, type PlayerInterface } from "@/lib/player-interface";
+import { HomeAssistantPlayerBridge, HomeAssistantSettings } from "./HomeAssistant";
 
 function NativeFrame({panel,title,children,controls}:{panel:NativePanel;title:string;children:ReactNode;controls?:ReactNode}) {
   const [state,setState]=useState<NativeWindowState>({detached:false,grouped:false});
@@ -94,6 +95,8 @@ export function NativeDesktop({panel}:{panel:NativePanel}) {
       setMenu({x:Math.max(0,Math.min(event.clientX,window.innerWidth-220)),y:Math.max(0,Math.min(event.clientY,window.innerHeight-190))});
     }}>
     {panel.kind==="main" && <PlayerBroadcaster/>}
+    {panel.kind === "main" && <HomeAssistantSettings />}
+    {panel.kind === "main" && !intro && <HomeAssistantPlayerBridge />}
     {!intro && !unified && <WinampCommands onTogglePL={()=>bridge?.control("toggle","pl")} onToggleEQ={()=>bridge?.control("toggle","eq")} onOpenLibrary={()=>bridge?.control("open","library")}/>}
     {intro?<IntroSplash onDone={()=>{p.ensureGraph();setIntro(false);bridge?.control("ready");}}/>:<NativeFrame panel={panel} title={title} controls={unified ? undefined : controls}>
       {unified ? <UnifiedPlayer skin={displaySkin} onSkin={candidate=>{savePlayerSkin(candidate,localStorage);setSkin(candidate);}} onInterface={switchInterface} onReset={()=>bridge?.control("arrange")} onExit={()=>bridge?.control("close")} /> : panel.kind==="main"?<>

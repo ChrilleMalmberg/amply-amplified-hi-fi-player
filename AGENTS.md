@@ -22,3 +22,5 @@
 - Native maximize uses the tested window-layout maximize helper with Electron workArea.width/height, and all grouped bounds pass finite integer validation before setBounds to prevent main-process conversion errors.
 - UnifiedPlayer reuses the existing playback, playlist, library and EQ controls; interface preferences persist separately from skin and queue data, and Electron handles panel visibility without remounting the audio owner.
 - Title-bar double-click maximizes/restores; Reset Windows resets geometry, shade, maximize and docking state from any panel using the shared native reset helper.
+- Home Assistant uses an opt-in, authenticated private-LAN Electron service on port 47824, separate from the fixed renderer origin; only the verified main renderer executes commands and publishes sanitized state, so remote control never creates another audio graph or exposes music files.
+- The Home Assistant custom integration lives in home-assistant/custom_components/amply and polls the local service without Lovable Cloud; keep its supported actions aligned with the tested Electron command allowlist.

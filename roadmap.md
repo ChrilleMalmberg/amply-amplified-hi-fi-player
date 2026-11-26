@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add an opt-in local Windows control service and Home Assistant custom integration; verify real Home Assistant 2026.11.1 controls against packaged Linux Electron playback and deliver a Windows test installer plus integration setup ZIP
+- [ ] Verify installation and playback on the user's Windows PC and live Home Assistant network; blocked on the user's hardware test before community release
 - [x] Correct website descriptions to v4.0 and update skin-selection setup instructions; publication remains a separate step
 - [x] Build, integrity-check and deliver the AmPly 4.0 Windows installer and matching website download package; Windows execution awaits user testing
 - [x] Make unified player the default with three skins and a switch to classic windows

@@ -5,6 +5,7 @@ import { PLAYER_SKINS } from "@/lib/player-skins";
 import { openDialog, toggleTimeDisplay } from "./WinampCommands";
 import { Button } from "@/components/ui/button";
 import type { PlayerInterface } from "@/lib/player-interface";
+import { desktopBridge } from "@/lib/desktop-bridge";
 
 type MenuBarProps = {
   skin: string;
@@ -136,6 +137,7 @@ export function MenuBar({ skin, onSkin, onOpenLibrary, onOpenPlugins, onCompact,
       </>)}
       {menu("settings", "Options", <>
         {item("Audio plug-ins / Advanced EQ", onOpenPlugins)}
+        {desktopBridge() && <Button variant="retro" size="retro" className="wa-menu-item" role="menuitem" onClick={() => { setOpen(null); window.dispatchEvent(new Event("amply:home-assistant-settings")); }}>Home Assistant…</Button>}
         {onTop && check(onTop.value, "Always on top", () => onTop.set(!onTop.value))}
       </>)}
       {menu("help", "Help", <>

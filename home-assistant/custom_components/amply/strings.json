@@ -1,0 +1,27 @@
+{
+  "title": "AmPly Windows",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pair AmPly on Windows",
+        "description": "Open AmPly → Options → Home Assistant and enable the controller. Enter the PC's private IPv4 address and copy its pairing key. Keep AmPly open and finish startup.",
+        "data": {"host": "Windows PC address", "port": "Controller port", "token": "Pairing key"}
+      },
+      "reauth_confirm": {
+        "title": "Update pairing key",
+        "description": "Copy the current key from AmPly → Options → Home Assistant.",
+        "data": {"token": "Pairing key"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach AmPly. Finish startup, enable its controller, check the PC address and allow port 47824 through Windows Firewall on your private network.",
+      "invalid_auth": "Pairing key rejected. Copy the current key from AmPly.",
+      "invalid_input": "Use a private IPv4 address, a valid port and the full pairing key."
+    },
+    "abort": {
+      "already_configured": "This AmPly player is already paired.",
+      "reauth_successful": "Pairing key updated.",
+      "wrong_device": "This is a different AmPly player. Add it as a new integration."
+    }
+  }
+}

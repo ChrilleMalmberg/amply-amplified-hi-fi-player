@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
+import type { ControllerCommand } from "./home-assistant-player";
 
 export type NativePanel = { id: string; kind: "main" | "pl" | "eq" | "library" | "plugins"; source: string };
 export type NativeWindowState = { detached: boolean; grouped: boolean; shaded?: boolean; maximized?: boolean };
+export type ControllerSettings = { enabled: boolean; token: string; port: number; addresses: string[]; error: string };
 export type DesktopBridge = {
   info: () => Promise<NativePanel>;
   control: (action: "ready" | "interface" | "open" | "toggle" | "close" | "minimize" | "maximize" | "arrange" | "compact" | "full" | "shade" | "detach" | "ontop", value?: string | boolean) => void;
   gesture: (action: "move" | "resize" | "end", axis?: "both" | "x" | "y") => void;
   onWindowState: (callback: (state: NativeWindowState) => void) => () => void;
+  homeAssistant: (action: "status" | "enable" | "disable" | "rotate" | "copy-token") => Promise<ControllerSettings>;
+  publishPlayer: (state: unknown) => void;
+  controllerResult: (result: unknown) => void;
+  onControllerCommand: (callback: (command: ControllerCommand) => void) => () => void;
 };
 declare global { interface Window { amplyDesktop?: DesktopBridge } }
 export function desktopBridge() { return typeof window === "undefined" ? undefined : window.amplyDesktop; }
