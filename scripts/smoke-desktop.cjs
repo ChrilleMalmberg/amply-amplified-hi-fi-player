@@ -31,40 +31,31 @@ function wav() {
     });
     await main.getByRole("button", { name: "Skip startup", exact: true }).click();
     await main.locator(".wa-main").waitFor();
+    await main.locator(".wa-pl").waitFor();
     assert.equal(new URL(main.url()).origin, "http://127.0.0.1:47823");
-    let playlist;
-    const deadline = Date.now() + 30000;
-    while (!playlist && Date.now() < deadline) {
-      for (const page of app.windows()) {
-        const kind = await page.evaluate(() => window.amplyDesktop?.info().then(p => p.kind)).catch(() => null);
-        if (kind === "pl") playlist = page;
-      }
-      if (!playlist) await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    assert.ok(playlist, "Independent playlist window opened");
-    await playlist.locator(".wa-pl input[type=file]").first().setInputFiles(["Bravo", "Alpha", "Charlie"].map(name => ({ name: name + ".wav", mimeType: "audio/wav", buffer: wav() })));
-    await playlist.waitForFunction(() => document.querySelectorAll(".wa-pl-list > .wa-pl-row").length === 3 && [...document.querySelectorAll(".wa-pl-list > .wa-pl-row")].every(row => row.textContent.includes("0:20")));
-    await playlist.locator(".wa-pl-list > .wa-pl-row").first().dblclick();
+    await main.locator(".wa-pl input[type=file]").first().setInputFiles(["Bravo", "Alpha", "Charlie"].map(name => ({ name: name + ".wav", mimeType: "audio/wav", buffer: wav() })));
+    await main.waitForFunction(() => document.querySelectorAll(".wa-pl-list > .wa-pl-row").length === 3 && [...document.querySelectorAll(".wa-pl-list > .wa-pl-row")].every(row => row.textContent.includes("0:20")));
+    await main.locator(".wa-pl-list > .wa-pl-row").first().dblclick();
     await main.waitForFunction(() => document.querySelector(".wa-status")?.textContent === "▶");
-    await playlist.getByRole("button", { name: "MISC", exact: true }).click();
-    await playlist.getByRole("menuitem", { name: "Sort by title", exact: true }).click();
-    await playlist.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("2. Bravo"));
-    await main.getByRole("button", { name: "Next", exact: true }).click();
-    await playlist.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Charlie"));
-    await playlist.locator(".wa-current").click();
-    await playlist.keyboard.press("Delete");
+    await main.getByRole("button", { name: "MISC", exact: true }).click();
+    await main.getByRole("menuitem", { name: "Sort by title", exact: true }).click();
+    await main.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("2. Bravo"));
+    await main.locator(".wa-main").getByRole("button", { name: "Next", exact: true }).click();
+    await main.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Charlie"));
+    await main.locator(".wa-current").click();
+    await main.keyboard.press("Delete");
     await main.waitForFunction(() => document.querySelector(".wa-status")?.textContent === "■");
     await main.locator(".wa-main").getByRole("button", { name: "Play", exact: true }).click();
-    await playlist.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Alpha"));
+    await main.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Alpha"));
     await main.context().setOffline(true);
-    await main.getByRole("button", { name: "Next", exact: true }).click();
-    await playlist.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Bravo"));
+    await main.locator(".wa-main").getByRole("button", { name: "Next", exact: true }).click();
+    await main.waitForFunction(() => document.querySelector(".wa-current")?.textContent.includes("Bravo"));
     await main.waitForFunction(() => {
       const text = document.querySelector(".wa-time")?.textContent || "";
       return text.includes("0:01") || text.includes("0:02");
     });
     assert.deepEqual(errors, []);
-    console.log("Packaged Windows startup, artwork, native playlist commands and offline WAV playback passed.");
+    console.log("Packaged Windows unified startup, artwork, playlist commands and offline WAV playback passed.");
   } finally {
     await app.close();
   }
