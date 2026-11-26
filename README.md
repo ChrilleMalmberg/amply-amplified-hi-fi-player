@@ -26,14 +26,16 @@ AmPly is a Win95-styled, sharp-edged audiophile music player with modern functio
 - **10-band equalizer** with presets, live dB readouts, and Advanced EQ (precise values, headroom suggestion, flat reset).
 - **Music library** — add folders, auto-sorted by artists, albums, genres, folders and sources using file tags.
 - **Playlists** saved and restored between sessions, fully offline.
-- **Skins** — Silver, Classic, Nucleo, Ruby, Matrix and Modern (right-click a title bar or View → Skins).
-- **Snapping windows** — panels docked to the player move, resize and maximize together; detach any panel to use it alone, even on another monitor.
-- **Menu bar** — File, Playlist, View and Settings menus.
+- **Unified or classic interface** — the default Audacious-inspired unified window keeps Playlist, Library, EQ and audio settings together; View → Interface restores the classic Winamp windows.
+- **Skins** — Silver, Modern and Matrix in the unified interface, plus Silver, Classic, Nucleo, Ruby, Matrix and Modern in classic mode.
+- **Snapping windows** — classic panels docked to the player move, resize and maximize together; detach any panel to use it alone, even on another monitor.
+- **Window controls** — double-click a title bar to maximize or restore; right-click for standard window actions and Reset Windows.
+- **Menu bar and shortcuts** — Winamp-style playback, playlist, view, options and help commands.
 - **Neon startup sequence** with progress bar and original startup sound.
 
 ## Windows app
 
-Download [the v3.1 Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v3.1/AmPly-V3.1-Setup.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
+Download [the v4.0 Windows installer](https://github.com/ChrilleMalmberg/amply-amplified-hi-fi-player/releases/download/v4.0/AmPly-V4.0-Setup.exe) and run it. It is unsigned, so Windows SmartScreen may warn: click **More info → Run anyway** only if you downloaded the installer from this project's release.
 
 Build it yourself:
 

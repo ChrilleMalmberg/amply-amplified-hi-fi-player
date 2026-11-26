@@ -18,7 +18,7 @@ Or connect the repository so every push redeploys automatically:
 
 ## Download files
 
-Windows downloads directly from the v3.1 public GitHub release (`AmPly-V3.1-Setup.exe`). The release workflow verifies and publishes this file after building on Windows.
+Windows downloads directly from the v4.0 public GitHub release (`AmPly-V4.0-Setup.exe`). The release workflow verifies and publishes this file after building on Windows.
 Debian currently links to its availability notice because no Debian package is attached to the public releases. Restore a download link only after its release asset exists.
 
 The Debian installer is about 119 MiB, exceeding Cloudflare Pages' 25 MiB per-file limit, so neither installer is included in the website ZIP. GitHub serves the downloads for free. The website remains a small static upload. See https://developers.cloudflare.com/pages/platform/limits/.

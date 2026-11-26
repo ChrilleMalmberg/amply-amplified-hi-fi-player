@@ -1,4 +1,4 @@
-name: Build and release AmPly v3.1
+name: Build and release AmPly v4.0
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: amply-v3.1-release
+  group: amply-v4.0-release
   cancel-in-progress: false
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set release directory
-        run: '"AMPLY_RELEASE_DIR=$env:RUNNER_TEMP\amply-v3.1-release" >> $env:GITHUB_ENV'
+        run: '"AMPLY_RELEASE_DIR=$env:RUNNER_TEMP\amply-v4.0-release" >> $env:GITHUB_ENV'
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -47,7 +47,7 @@ jobs:
       - name: Check release version
         run: |
           $version = (Get-Content package.json | ConvertFrom-Json).version
-          if ($version -ne '3.1.0') { throw "This workflow only releases 3.1.0" }
+          if ($version -ne '4.0.0') { throw "This workflow only releases 4.0.0" }
       - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun run package:win
       - name: Install desktop test driver and installer compiler
@@ -63,7 +63,7 @@ jobs:
         env:
           AMPLY_PLAYWRIGHT_PATH: ${{ runner.temp }}\amply-e2e\node_modules\playwright
         run: |
-          $installer = "$env:AMPLY_RELEASE_DIR\AmPly-V3.1-Setup.exe"
+          $installer = "$env:AMPLY_RELEASE_DIR\AmPly-V4.0-Setup.exe"
           & "${env:ProgramFiles(x86)}\NSIS\makensis.exe" "/DPACKAGE_DIR=$env:AMPLY_RELEASE_DIR\Ampli Player-win32-x64" "/DINSTALLER_OUT=$installer" electron/installer.nsi
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $installed = "$env:RUNNER_TEMP\amply-installed"
@@ -72,21 +72,21 @@ jobs:
           node scripts/smoke-desktop.cjs "$installed\Ampli Player.exe"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $hash = (Get-FileHash -Algorithm SHA256 $installer).Hash.ToLower()
-          "$hash  AmPly-V3.1-Setup.exe" | Set-Content -Encoding ascii "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt"
-          Compress-Archive -Path site\* -DestinationPath "$env:AMPLY_RELEASE_DIR\amply-website-v3.1.zip"
+          "$hash  AmPly-V4.0-Setup.exe" | Set-Content -Encoding ascii "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt"
+          Compress-Archive -Path site\* -DestinationPath "$env:AMPLY_RELEASE_DIR\amply-website-v4.0.zip"
       - uses: actions/upload-artifact@v4
         with:
-          name: amply-v3.1-release
+          name: amply-v4.0-release
           path: |
-            ${{ env.AMPLY_RELEASE_DIR }}\AmPly-V3.1-Setup.exe
+            ${{ env.AMPLY_RELEASE_DIR }}\AmPly-V4.0-Setup.exe
             ${{ env.AMPLY_RELEASE_DIR }}\SHA256SUMS.txt
-            ${{ env.AMPLY_RELEASE_DIR }}\amply-website-v3.1.zip
+            ${{ env.AMPLY_RELEASE_DIR }}\amply-website-v4.0.zip
       - name: Publish the verified installer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           RELEASE_COMMIT: ${{ github.sha }}
         run: |
-          gh release view v3.1 --json tagName
-          if ($LASTEXITCODE -eq 0) { Write-Host 'v3.1 already exists; published assets were preserved.'; exit 0 }
-          gh release create v3.1 "$env:AMPLY_RELEASE_DIR\AmPly-V3.1-Setup.exe" "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt" "$env:AMPLY_RELEASE_DIR\amply-website-v3.1.zip" --target "$env:RELEASE_COMMIT" --title "AmPly v3.1" --notes-file docs/release-v3.1.md --latest
+          gh release view v4.0 --json tagName
+          if ($LASTEXITCODE -eq 0) { Write-Host 'v4.0 already exists; published assets were preserved.'; exit 0 }
+          gh release create v4.0 "$env:AMPLY_RELEASE_DIR\AmPly-V4.0-Setup.exe" "$env:AMPLY_RELEASE_DIR\SHA256SUMS.txt" "$env:AMPLY_RELEASE_DIR\amply-website-v4.0.zip" --target "$env:RELEASE_COMMIT" --title "AmPly v4.0" --notes-file docs/release-v4.0.md --latest

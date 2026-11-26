@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Build, integrity-check and deliver the AmPly 4.0 Windows installer and matching website download package; Windows execution awaits user testing
 - [x] Make unified player the default with three skins and a switch to classic windows
 - [x] Fix title-bar double-click maximize/restore, detached-window snapping and single-axis resizing, window context menu, and Reset Windows (browser and actual Linux Electron checks passed; Windows testing still needed)
 - [x] Fix native maximize error, right-align all panel title-bar controls, verify and deliver AmPly v3.4 Windows installer (native Linux maximize/restore verified; Windows execution awaits user test)
