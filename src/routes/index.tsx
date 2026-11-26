@@ -15,9 +15,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "AmPly — Amplified Hi-Fi Player" },
-      { name: "description", content: "Download AmPly v3.1 for Windows: a free retro music player with a 10-band EQ, offline playlists and independent desktop windows." },
+      { name: "description", content: "Download AmPly v4.0 for Windows: a free retro music player with a 10-band EQ, offline playlists and unified or classic interfaces." },
       { property: "og:title", content: "AmPly — Amplified Hi-Fi Player" },
-      { property: "og:description", content: "Download AmPly v3.1 for Windows, explore the skins and get started with offline music playback." },
+      { property: "og:description", content: "Download AmPly v4.0 for Windows, explore the skins and get started with offline music playback." },
       { property: "og:image", content: "https://amply.win/marketing/img/amply-logo.jpg" },
       { name: "twitter:image", content: "https://amply.win/marketing/img/amply-logo.jpg" },
       { property: "og:type", content: "website" },
